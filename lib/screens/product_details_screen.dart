@@ -11,8 +11,7 @@ import '../state/category_list_notifier.dart';
 import '../state/product_list_notifier.dart';
 import '../state/supplier_list_notifier.dart';
 
-class ProductDetailsScreen
-    extends StatelessWidget {
+class ProductDetailsScreen extends StatelessWidget {
   final int id;
 
   const ProductDetailsScreen({
@@ -23,17 +22,11 @@ class ProductDetailsScreen
   Future<List<Object?>> _load(
     BuildContext context,
   ) async {
-    final product = await context
-        .read<ProductListNotifier>()
-        .findById(id);
+    final product = await context.read<ProductListNotifier>().findById(id);
 
-    final categories = await context
-        .read<CategoryListNotifier>()
-        .getAll();
+    final categories = await context.read<CategoryListNotifier>().getAll();
 
-    final suppliers = await context
-        .read<SupplierListNotifier>()
-        .getAll();
+    final suppliers = await context.read<SupplierListNotifier>().getAll();
 
     return [
       product,
@@ -46,19 +39,14 @@ class ProductDetailsScreen
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Товар'),
+        title: const Text('Товар'),
       ),
-
       body: FutureBuilder<List<Object?>>(
         future: _load(context),
-
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             );
           }
 
@@ -72,8 +60,7 @@ class ProductDetailsScreen
 
           final data = snapshot.data;
 
-          if (data == null ||
-              data[0] == null) {
+          if (data == null || data[0] == null) {
             return const Center(
               child: Text(
                 'Запись не найдена',
@@ -81,16 +68,11 @@ class ProductDetailsScreen
             );
           }
 
-          final product =
-              data[0] as Product;
+          final product = data[0] as Product;
 
-          final categories =
-              data[1]
-                  as List<Category>;
+          final categories = data[1] as List<Category>;
 
-          final suppliers =
-              data[2]
-                  as List<Supplier>;
+          final suppliers = data[2] as List<Supplier>;
 
           var supplier = 'Не найден';
 
@@ -101,36 +83,25 @@ class ProductDetailsScreen
             }
           }
 
-          final categoryNames =
-              categories
-                  .where(
-                    (c) => product
-                        .categoryIds
-                        .contains(c.id),
-                  )
-                  .map((c) => c.name)
-                  .join(', ');
+          final categoryNames = categories
+              .where(
+                (c) => product.categoryIds.contains(c.id),
+              )
+              .map((c) => c.name)
+              .join(', ');
 
-          final canManage =
-              context
-                  .watch<AuthNotifier>()
-                  .can(
-                AppPermission
-                    .manageCatalog,
+          final canManage = context.watch<AuthNotifier>().can(
+                AppPermission.manageCatalog,
               );
 
           return ListView(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
             children: [
               Text(
                 product.name,
-                style:
-                    Theme.of(context)
-                        .textTheme
-                        .headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(
                 height: 16,
@@ -162,16 +133,14 @@ class ProductDetailsScreen
               const SizedBox(
                 height: 20,
               ),
-              if (canManage &&
-                  !product.isDeleted)
+              if (canManage && !product.isDeleted)
                 FilledButton.icon(
                   onPressed: () {
                     context.push(
                       '/products/$id/edit',
                     );
                   },
-                  icon:
-                      const Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   label: const Text(
                     'Редактировать',
                   ),

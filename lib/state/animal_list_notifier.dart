@@ -7,22 +7,18 @@ import '../models/page_result.dart';
 import '../repositories/animal_repository.dart';
 import 'load_status.dart';
 
-class AnimalListNotifier
-    extends ChangeNotifier {
+class AnimalListNotifier extends ChangeNotifier {
   final AnimalRepository _repository;
 
   AnimalListNotifier(
     this._repository,
   );
 
-  AnimalQuery _query =
-      const AnimalQuery();
+  AnimalQuery _query = const AnimalQuery();
 
-  PageResult<Animal> _result =
-      PageResult<Animal>.empty();
+  PageResult<Animal> _result = PageResult<Animal>.empty();
 
-  LoadStatus _status =
-      LoadStatus.idle;
+  LoadStatus _status = LoadStatus.idle;
 
   String? _error;
 
@@ -30,15 +26,13 @@ class AnimalListNotifier
 
   AnimalQuery get query => _query;
 
-  PageResult<Animal> get result =>
-      _result;
+  PageResult<Animal> get result => _result;
 
   LoadStatus get status => _status;
 
   String? get error => _error;
 
-  Set<int> get selected =>
-      Set.unmodifiable(_selected);
+  Set<int> get selected => Set.unmodifiable(_selected);
 
   Future<void> load() async {
     _status = LoadStatus.loading;
@@ -47,8 +41,7 @@ class AnimalListNotifier
     notifyListeners();
 
     try {
-      _result =
-          await _repository.find(
+      _result = await _repository.find(
         _query,
       );
 
@@ -59,8 +52,7 @@ class AnimalListNotifier
       _error = e.message;
       _status = LoadStatus.error;
     } catch (e) {
-      _error =
-          'Неизвестная ошибка: $e';
+      _error = 'Неизвестная ошибка: $e';
 
       _status = LoadStatus.error;
     }
@@ -96,8 +88,7 @@ class AnimalListNotifier
   Future<Animal> create(
     Animal animal,
   ) async {
-    final created =
-        await _repository.create(
+    final created = await _repository.create(
       animal,
     );
 

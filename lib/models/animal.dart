@@ -16,8 +16,7 @@ class Animal {
 
   final int supplierId;
 
-  final List<int>
-      categoryIds;
+  final List<int> categoryIds;
 
   final String description;
 
@@ -38,8 +37,7 @@ class Animal {
     this.deletedAt,
   });
 
-  bool get isDeleted =>
-      deletedAt != null;
+  bool get isDeleted => deletedAt != null;
 
   Animal copyWith({
     int? id,
@@ -58,181 +56,104 @@ class Animal {
   }) {
     return Animal(
       id: id ?? this.id,
-
-      name:
-          name ?? this.name,
-
-      species:
-          species ??
-              this.species,
-
-      breed:
-          breed ?? this.breed,
-
-      ageMonths:
-          ageMonths ??
-              this.ageMonths,
-
-      sex:
-          sex ?? this.sex,
-
-      country:
-          country ??
-              this.country,
-
-      price:
-          price ?? this.price,
-
-      supplierId:
-          supplierId ??
-              this.supplierId,
-
-      categoryIds:
-          categoryIds ??
-              this.categoryIds,
-
-      description:
-          description ??
-              this.description,
-
-      deletedAt:
-          clearDeletedAt
-              ? null
-              : deletedAt ??
-                  this.deletedAt,
+      name: name ?? this.name,
+      species: species ?? this.species,
+      breed: breed ?? this.breed,
+      ageMonths: ageMonths ?? this.ageMonths,
+      sex: sex ?? this.sex,
+      country: country ?? this.country,
+      price: price ?? this.price,
+      supplierId: supplierId ?? this.supplierId,
+      categoryIds: categoryIds ?? this.categoryIds,
+      description: description ?? this.description,
+      deletedAt: clearDeletedAt ? null : deletedAt ?? this.deletedAt,
     );
   }
 
-  Map<String, dynamic>
-      toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'species': species,
       'breed': breed,
-      'ageMonths':
-          ageMonths,
+      'ageMonths': ageMonths,
       'sex': sex,
       'country': country,
       'price': price,
-      'supplierId':
-          supplierId,
-      'categoryIds':
-          categoryIds,
-      'description':
-          description,
+      'supplierId': supplierId,
+      'categoryIds': categoryIds,
+      'description': description,
     };
   }
 
   factory Animal.fromJson(
     Map<String, dynamic> json,
   ) {
-    var supplierId =
-        jsonInt(
+    var supplierId = jsonInt(
       json,
       'supplierId',
     );
 
-    final supplier =
-        json['supplier'];
+    final supplier = json['supplier'];
 
-    if (
-      supplierId == 0 &&
-      supplier is Map
-    ) {
-      supplierId =
-          (supplier['id'] as num?)
-                  ?.toInt() ??
-              0;
+    if (supplierId == 0 && supplier is Map) {
+      supplierId = (supplier['id'] as num?)?.toInt() ?? 0;
     }
 
-    var categoryIds =
-        jsonIntList(
+    var categoryIds = jsonIntList(
       json,
       'categoryIds',
     );
 
-    if (
-      categoryIds.isEmpty &&
-      json['categories']
-          is List
-    ) {
-      categoryIds =
-          (json['categories']
-                  as List)
-              .whereType<Map>()
-              .map(
-                (item) =>
-                    (item['id']
-                            as num?)
-                        ?.toInt(),
-              )
-              .whereType<int>()
-              .toList();
+    if (categoryIds.isEmpty && json['categories'] is List) {
+      categoryIds = (json['categories'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => (item['id'] as num?)?.toInt(),
+          )
+          .whereType<int>()
+          .toList();
     }
 
     return Animal(
-      id:
-          jsonInt(
+      id: jsonInt(
         json,
         'id',
       ),
-
-      name:
-          jsonString(
+      name: jsonString(
         json,
         'name',
       ),
-
-      species:
-          jsonString(
+      species: jsonString(
         json,
         'species',
       ),
-
-      breed:
-          jsonString(
+      breed: jsonString(
         json,
         'breed',
       ),
-
-      ageMonths:
-          jsonInt(
+      ageMonths: jsonInt(
         json,
         'ageMonths',
       ),
-
-      sex:
-          jsonString(
+      sex: jsonString(
         json,
         'sex',
       ),
-
-      country:
-          jsonString(
+      country: jsonString(
         json,
         'country',
       ),
-
-      price:
-          jsonDouble(
+      price: jsonDouble(
         json,
         'price',
       ),
-
-      supplierId:
-          supplierId,
-
-      categoryIds:
-          categoryIds,
-
-      description:
-          jsonString(
+      supplierId: supplierId,
+      categoryIds: categoryIds,
+      description: jsonString(
         json,
         'description',
       ),
-
-      deletedAt:
-          jsonDate(
+      deletedAt: jsonDate(
         json,
         'deletedAt',
       ),

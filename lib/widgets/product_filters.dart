@@ -6,15 +6,13 @@ import '../models/category.dart';
 import '../models/product_query.dart';
 import '../models/supplier.dart';
 
-class ProductFilters
-    extends StatefulWidget {
+class ProductFilters extends StatefulWidget {
   final ProductQuery query;
 
   final List<Category> categories;
   final List<Supplier> suppliers;
 
-  final ValueChanged<ProductQuery>
-      onChanged;
+  final ValueChanged<ProductQuery> onChanged;
 
   final bool showDeletedToggle;
 
@@ -28,21 +26,15 @@ class ProductFilters
   });
 
   @override
-  State<ProductFilters>
-      createState() =>
-          _ProductFiltersState();
+  State<ProductFilters> createState() => _ProductFiltersState();
 }
 
-class _ProductFiltersState
-    extends State<ProductFilters> {
-  late final TextEditingController
-      _searchController;
+class _ProductFiltersState extends State<ProductFilters> {
+  late final TextEditingController _searchController;
 
-  late final TextEditingController
-      _priceFrom;
+  late final TextEditingController _priceFrom;
 
-  late final TextEditingController
-      _priceTo;
+  late final TextEditingController _priceTo;
 
   Timer? _timer;
 
@@ -50,24 +42,16 @@ class _ProductFiltersState
   void initState() {
     super.initState();
 
-    _searchController =
-        TextEditingController(
+    _searchController = TextEditingController(
       text: widget.query.search,
     );
 
-    _priceFrom =
-        TextEditingController(
-      text: widget.query.priceFrom
-              ?.toString() ??
-          '',
+    _priceFrom = TextEditingController(
+      text: widget.query.priceFrom?.toString() ?? '',
     );
 
-    _priceTo =
-        TextEditingController(
-      text:
-          widget.query.priceTo
-                  ?.toString() ??
-              '',
+    _priceTo = TextEditingController(
+      text: widget.query.priceTo?.toString() ?? '',
     );
   }
 
@@ -109,184 +93,112 @@ class _ProductFiltersState
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding:
-            const EdgeInsets.all(16),
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
-              controller:
-                  _searchController,
-
+              controller: _searchController,
               onChanged: _search,
-
-              decoration:
-                  const InputDecoration(
-                labelText:
-                    'Поиск по названию, артикулу или бренду',
-                prefixIcon:
-                    Icon(Icons.search),
-                border:
-                    OutlineInputBorder(),
+              decoration: const InputDecoration(
+                labelText: 'Поиск по названию, артикулу или бренду',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 14),
-
             Wrap(
               spacing: 12,
               runSpacing: 12,
-              crossAxisAlignment:
-                  WrapCrossAlignment
-                      .center,
-
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 SizedBox(
                   width: 220,
-
-                  child:
-                      DropdownButtonFormField<
-                          int>(
-                    initialValue:
-                        widget
-                            .query
-                            .categoryId,
+                  child: DropdownButtonFormField<int>(
+                    initialValue: widget.query.categoryId,
                     isExpanded: true,
-
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Категория',
-                      border:
-                          OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Категория',
+                      border: OutlineInputBorder(),
                     ),
-
                     items: [
-                      const DropdownMenuItem<
-                          int>(
+                      const DropdownMenuItem<int>(
                         value: null,
-                        child:
-                            Text('Все'),
+                        child: Text('Все'),
                       ),
-
-                      ...widget.categories
-                          .map(
-                        (c) =>
-                            DropdownMenuItem<
-                                int>(
+                      ...widget.categories.map(
+                        (c) => DropdownMenuItem<int>(
                           value: c.id,
-                          child:
-                              Text(c.name),
+                          child: Text(c.name),
                         ),
                       ),
                     ],
-
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
-                          categoryId:
-                              value,
+                        widget.query.copyWith(
+                          categoryId: value,
                         ),
                       );
                     },
                   ),
                 ),
-
                 SizedBox(
                   width: 240,
-
-                  child:
-                      DropdownButtonFormField<
-                          int>(
-                    initialValue:
-                        widget
-                            .query
-                            .supplierId,
+                  child: DropdownButtonFormField<int>(
+                    initialValue: widget.query.supplierId,
                     isExpanded: true,
-
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Поставщик',
-                      border:
-                          OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Поставщик',
+                      border: OutlineInputBorder(),
                     ),
-
                     items: [
-                      const DropdownMenuItem<
-                          int>(
+                      const DropdownMenuItem<int>(
                         value: null,
-                        child:
-                            Text('Все'),
+                        child: Text('Все'),
                       ),
-
-                      ...widget.suppliers
-                          .map(
-                        (s) =>
-                            DropdownMenuItem<
-                                int>(
+                      ...widget.suppliers.map(
+                        (s) => DropdownMenuItem<int>(
                           value: s.id,
-                          child:
-                              Text(s.name),
+                          child: Text(s.name),
                         ),
                       ),
                     ],
-
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
-                          supplierId:
-                              value,
+                        widget.query.copyWith(
+                          supplierId: value,
                         ),
                       );
                     },
                   ),
                 ),
-
                 SizedBox(
                   width: 150,
                   child: TextField(
-                    controller:
-                        _priceFrom,
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Цена от, ₽',
-                      border:
-                          OutlineInputBorder(),
+                    controller: _priceFrom,
+                    decoration: const InputDecoration(
+                      labelText: 'Цена от, ₽',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-
                 SizedBox(
                   width: 150,
                   child: TextField(
-                    controller:
-                        _priceTo,
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Цена до, ₽',
-                      border:
-                          OutlineInputBorder(),
+                    controller: _priceTo,
+                    decoration: const InputDecoration(
+                      labelText: 'Цена до, ₽',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-
                 FilledButton(
                   onPressed: () {
                     widget.onChanged(
-                      widget.query
-                          .copyWith(
-                        priceFrom:
-                            _number(
-                          _priceFrom
-                              .text,
+                      widget.query.copyWith(
+                        priceFrom: _number(
+                          _priceFrom.text,
                         ),
-                        priceTo:
-                            _number(
+                        priceTo: _number(
                           _priceTo.text,
                         ),
                       ),
@@ -298,27 +210,18 @@ class _ProductFiltersState
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
-
             Wrap(
               spacing: 10,
-              crossAxisAlignment:
-                  WrapCrossAlignment
-                      .center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                if (widget
-                    .showDeletedToggle) ...[
+                if (widget.showDeletedToggle) ...[
                   Switch(
-                    value: widget
-                        .query
-                        .includeDeleted,
+                    value: widget.query.includeDeleted,
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
-                          includeDeleted:
-                              value,
+                        widget.query.copyWith(
+                          includeDeleted: value,
                         ),
                       );
                     },
@@ -331,8 +234,7 @@ class _ProductFiltersState
                   onPressed: () {
                     widget.onChanged(
                       ProductQuery(
-                        size:
-                            widget.query.size,
+                        size: widget.query.size,
                       ),
                     );
                   },

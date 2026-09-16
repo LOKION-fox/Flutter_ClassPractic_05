@@ -4,18 +4,15 @@ import 'package:flutter/material.dart';
 
 import '../models/simple_query.dart';
 
-class SimpleFilters
-    extends StatefulWidget {
+class SimpleFilters extends StatefulWidget {
   final SimpleQuery query;
 
   final String searchLabel;
   final String filterLabel;
 
-  final Map<String, String>
-      filterOptions;
+  final Map<String, String> filterOptions;
 
-  final ValueChanged<SimpleQuery>
-      onChanged;
+  final ValueChanged<SimpleQuery> onChanged;
 
   const SimpleFilters({
     super.key,
@@ -27,15 +24,11 @@ class SimpleFilters
   });
 
   @override
-  State<SimpleFilters>
-      createState() =>
-          _SimpleFiltersState();
+  State<SimpleFilters> createState() => _SimpleFiltersState();
 }
 
-class _SimpleFiltersState
-    extends State<SimpleFilters> {
-  late final TextEditingController
-      _searchController;
+class _SimpleFiltersState extends State<SimpleFilters> {
+  late final TextEditingController _searchController;
 
   Timer? _timer;
 
@@ -43,8 +36,7 @@ class _SimpleFiltersState
   void initState() {
     super.initState();
 
-    _searchController =
-        TextEditingController(
+    _searchController = TextEditingController(
       text: widget.query.search,
     );
   }
@@ -55,10 +47,8 @@ class _SimpleFiltersState
   ) {
     super.didUpdateWidget(oldWidget);
 
-    if (_searchController.text !=
-        widget.query.search) {
-      _searchController.text =
-          widget.query.search;
+    if (_searchController.text != widget.query.search) {
+      _searchController.text = widget.query.search;
     }
   }
 
@@ -91,76 +81,44 @@ class _SimpleFiltersState
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding:
-            const EdgeInsets.all(16),
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
-              controller:
-                  _searchController,
-
-              decoration:
-                  InputDecoration(
-                labelText:
-                    widget.searchLabel,
-                prefixIcon:
-                    const Icon(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: widget.searchLabel,
+                prefixIcon: const Icon(
                   Icons.search,
                 ),
-                border:
-                    const OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
-
               onChanged: _search,
             ),
-
             const SizedBox(height: 14),
-
             Wrap(
               spacing: 12,
               runSpacing: 12,
-              crossAxisAlignment:
-                  WrapCrossAlignment
-                      .center,
-
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 SizedBox(
                   width: 230,
-
-                  child:
-                      DropdownButtonFormField<
-                          String>(
-                    initialValue:
-                        widget.query.filter,
-
+                  child: DropdownButtonFormField<String>(
+                    initialValue: widget.query.filter,
                     isExpanded: true,
-
-                    decoration:
-                        InputDecoration(
-                      labelText:
-                          widget.filterLabel,
-                      border:
-                          const OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: widget.filterLabel,
+                      border: const OutlineInputBorder(),
                     ),
-
                     items: [
-                      const DropdownMenuItem<
-                          String>(
+                      const DropdownMenuItem<String>(
                         value: null,
-                        child:
-                            Text('Все'),
+                        child: Text('Все'),
                       ),
-
-                      ...widget
-                          .filterOptions
-                          .entries
-                          .map(
+                      ...widget.filterOptions.entries.map(
                         (entry) {
-                          return DropdownMenuItem<
-                              String>(
-                            value:
-                                entry.key,
+                          return DropdownMenuItem<String>(
+                            value: entry.key,
                             child: Text(
                               entry.value,
                             ),
@@ -168,51 +126,38 @@ class _SimpleFiltersState
                         },
                       ),
                     ],
-
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
+                        widget.query.copyWith(
                           filter: value,
                         ),
                       );
                     },
                   ),
                 ),
-
                 Row(
-                  mainAxisSize:
-                      MainAxisSize.min,
-
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Switch(
-                      value: widget
-                          .query
-                          .includeDeleted,
-
+                      value: widget.query.includeDeleted,
                       onChanged: (value) {
                         widget.onChanged(
-                          widget.query
-                              .copyWith(
-                            includeDeleted:
-                                value,
+                          widget.query.copyWith(
+                            includeDeleted: value,
                           ),
                         );
                       },
                     ),
-
                     const Text(
                       'Показывать удалённые',
                     ),
                   ],
                 ),
-
                 TextButton.icon(
                   onPressed: () {
                     widget.onChanged(
                       SimpleQuery(
-                        size:
-                            widget.query.size,
+                        size: widget.query.size,
                       ),
                     );
                   },

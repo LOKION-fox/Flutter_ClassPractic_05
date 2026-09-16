@@ -27,8 +27,7 @@ int jsonInt(
     return value.toInt();
   }
 
-  return int.tryParse(value?.toString() ?? '') ??
-      fallback;
+  return int.tryParse(value?.toString() ?? '') ?? fallback;
 }
 
 double jsonDouble(

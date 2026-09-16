@@ -8,8 +8,7 @@ import '../models/animal_query.dart';
 import '../models/page_result.dart';
 import 'animal_repository.dart';
 
-class ApiAnimalRepository
-    implements AnimalRepository {
+class ApiAnimalRepository implements AnimalRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -33,16 +32,13 @@ class ApiAnimalRepository
     _findCancelToken = token;
 
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/animals',
-        queryParameters:
-            query.toApiQueryParameters(),
+        queryParameters: query.toApiQueryParameters(),
         cancelToken: token,
       );
 
-      return PageResult<Animal>
-          .fromJson(
+      return PageResult<Animal>.fromJson(
         Map<String, dynamic>.from(
           response.data as Map,
         ),
@@ -60,8 +56,7 @@ class ApiAnimalRepository
 
   @override
   Future<List<Animal>> all() async {
-    final response =
-        await _api.get(
+    final response = await _api.get(
       '/animals',
       queryParameters: {
         'page': 1,
@@ -83,8 +78,7 @@ class ApiAnimalRepository
     int id,
   ) async {
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/animals/$id',
         queryParameters: {
           'includeDeleted': 'true',
@@ -107,8 +101,7 @@ class ApiAnimalRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/animals',
           data: animal.toJson(),
         );
@@ -184,19 +177,14 @@ class ApiAnimalRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/animals/bulk-delete',
           data: {
             'ids': ids,
           },
         );
 
-        return (response
-                    .data['deleted']
-                as num?)
-            ?.toInt() ??
-            0;
+        return (response.data['deleted'] as num?)?.toInt() ?? 0;
       },
     );
   }

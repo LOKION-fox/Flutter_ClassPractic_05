@@ -20,11 +20,9 @@ class PageResult<T> {
     return (total / size).ceil();
   }
 
-  bool get hasPrevious =>
-      page > 1;
+  bool get hasPrevious => page > 1;
 
-  bool get hasNext =>
-      page < totalPages;
+  bool get hasNext => page < totalPages;
 
   factory PageResult.fromJson(
     Map<String, dynamic> json,
@@ -32,20 +30,16 @@ class PageResult<T> {
       Map<String, dynamic>,
     ) fromJson,
   ) {
-    final rawItems =
-        json['items'];
+    final rawItems = json['items'];
 
     final items = <T>[];
 
     if (rawItems is List) {
-      for (
-        final item in rawItems
-      ) {
+      for (final item in rawItems) {
         if (item is Map) {
           items.add(
             fromJson(
-              Map<String, dynamic>
-                  .from(item),
+              Map<String, dynamic>.from(item),
             ),
           );
         }
@@ -54,21 +48,9 @@ class PageResult<T> {
 
     return PageResult<T>(
       items: items,
-
-      page:
-          (json['page'] as num?)
-                  ?.toInt() ??
-              1,
-
-      size:
-          (json['size'] as num?)
-                  ?.toInt() ??
-              10,
-
-      total:
-          (json['total'] as num?)
-                  ?.toInt() ??
-              items.length,
+      page: (json['page'] as num?)?.toInt() ?? 1,
+      size: (json['size'] as num?)?.toInt() ?? 10,
+      total: (json['total'] as num?)?.toInt() ?? items.length,
     );
   }
 

@@ -15,12 +15,8 @@ class AuthResult {
     Map<String, dynamic> json,
   ) {
     return AuthResult(
-      accessToken:
-          json['accessToken']?.toString() ?? '',
-
-      refreshToken:
-          json['refreshToken']?.toString() ?? '',
-
+      accessToken: json['accessToken']?.toString() ?? '',
+      refreshToken: json['refreshToken']?.toString() ?? '',
       user: AppUser.fromJson(
         Map<String, dynamic>.from(
           json['user'] as Map,

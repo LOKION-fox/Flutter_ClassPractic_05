@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MultiSelectField<T>
-    extends StatelessWidget {
+class MultiSelectField<T> extends StatelessWidget {
   final String label;
 
   final List<T> items;
@@ -10,14 +9,11 @@ class MultiSelectField<T>
 
   final int Function(T item) idOf;
 
-  final String Function(T item)
-      labelOf;
+  final String Function(T item) labelOf;
 
-  final ValueChanged<List<int>>
-      onChanged;
+  final ValueChanged<List<int>> onChanged;
 
-  final String? Function(List<int>?)
-      validator;
+  final String? Function(List<int>?) validator;
 
   const MultiSelectField({
     super.key,
@@ -42,10 +38,8 @@ class MultiSelectField<T>
         return InputDecorator(
           decoration: InputDecoration(
             labelText: label,
-            border:
-                const OutlineInputBorder(),
-            errorText:
-                field.errorText,
+            border: const OutlineInputBorder(),
+            errorText: field.errorText,
           ),
           child: Wrap(
             spacing: 8,
@@ -53,18 +47,13 @@ class MultiSelectField<T>
             children: items.map((item) {
               final id = idOf(item);
 
-              final selected =
-                  field.value
-                          ?.contains(id) ??
-                      false;
+              final selected = field.value?.contains(id) ?? false;
 
               return FilterChip(
-                label:
-                    Text(labelOf(item)),
+                label: Text(labelOf(item)),
                 selected: selected,
                 onSelected: (_) {
-                  final next =
-                      List<int>.from(
+                  final next = List<int>.from(
                     field.value ?? [],
                   );
 

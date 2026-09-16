@@ -5,61 +5,45 @@ import 'package:provider/provider.dart';
 import '../core/api_exceptions.dart';
 import '../state/auth_notifier.dart';
 
-class RegisterScreen
-    extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({
     super.key,
   });
 
   @override
-  State<RegisterScreen>
-      createState() =>
-          _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState
-    extends State<RegisterScreen> {
-  final _formKey =
-      GlobalKey<FormState>();
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  final _username =
-      TextEditingController();
+  final _username = TextEditingController();
 
-  final _fullName =
-      TextEditingController();
+  final _fullName = TextEditingController();
 
-  final _password =
-      TextEditingController();
+  final _password = TextEditingController();
 
-  final _confirm =
-      TextEditingController();
+  final _confirm = TextEditingController();
 
-  Map<String, String>
-      _serverErrors = {};
+  Map<String, String> _serverErrors = {};
 
   bool _loading = false;
 
-  bool get _lengthOk =>
-      _password.text.length >= 8;
+  bool get _lengthOk => _password.text.length >= 8;
 
-  bool get _digitOk =>
-      RegExp(
+  bool get _digitOk => RegExp(
         r'[0-9]',
       ).hasMatch(
         _password.text,
       );
 
-  bool get _specialOk =>
-      RegExp(
+  bool get _specialOk => RegExp(
         r'[^A-Za-zА-Яа-яЁё0-9]',
       ).hasMatch(
         _password.text,
       );
 
-  bool get _passwordOk =>
-      _lengthOk &&
-      _digitOk &&
-      _specialOk;
+  bool get _passwordOk => _lengthOk && _digitOk && _specialOk;
 
   Widget _requirement(
     String text,
@@ -68,19 +52,13 @@ class _RegisterScreenState
     return Row(
       children: [
         Icon(
-          ok
-              ? Icons.check_circle
-              : Icons.cancel,
+          ok ? Icons.check_circle : Icons.cancel,
           size: 18,
-          color: ok
-              ? Colors.green
-              : Colors.red,
+          color: ok ? Colors.green : Colors.red,
         ),
-
         const SizedBox(
           width: 6,
         ),
-
         Text(text),
       ],
     );
@@ -91,8 +69,7 @@ class _RegisterScreenState
       _serverErrors = {};
     });
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -105,19 +82,10 @@ class _RegisterScreenState
     });
 
     try {
-      await context
-          .read<AuthNotifier>()
-          .register(
-            username:
-                _username.text
-                    .trim(),
-
-            fullName:
-                _fullName.text
-                    .trim(),
-
-            password:
-                _password.text,
+      await context.read<AuthNotifier>().register(
+            username: _username.text.trim(),
+            fullName: _fullName.text.trim(),
+            password: _password.text,
           );
 
       if (!mounted) {
@@ -127,12 +95,10 @@ class _RegisterScreenState
       context.go('/');
     } on ValidationException catch (e) {
       setState(() {
-        _serverErrors =
-            e.errors;
+        _serverErrors = e.errors;
       });
 
-      _formKey.currentState
-          ?.validate();
+      _formKey.currentState?.validate();
     } on ApiException catch (e) {
       if (!mounted) {
         return;
@@ -142,8 +108,7 @@ class _RegisterScreenState
         context,
       ).showSnackBar(
         SnackBar(
-          content:
-              Text(e.message),
+          content: Text(e.message),
         ),
       );
     } finally {
@@ -171,165 +136,102 @@ class _RegisterScreenState
   ) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Регистрация'),
+        title: const Text('Регистрация'),
       ),
-
       body: Center(
-        child:
-            SingleChildScrollView(
-          padding:
-              const EdgeInsets.all(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(
             24,
           ),
-
           child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(
+            constraints: const BoxConstraints(
               maxWidth: 480,
             ),
-
             child: Form(
               key: _formKey,
-
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .stretch,
-
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextFormField(
-                    controller:
-                        _username,
-
-                    decoration:
-                        const InputDecoration(
+                    controller: _username,
+                    decoration: const InputDecoration(
                       labelText: 'Логин',
-                      border:
-                          OutlineInputBorder(),
+                      border: OutlineInputBorder(),
                     ),
-
                     onChanged: (_) {
                       setState(() {
-                        _serverErrors
-                            .remove(
+                        _serverErrors.remove(
                           'username',
                         );
                       });
                     },
-
-                    validator:
-                        (value) {
-                      if (_serverErrors[
-                              'username'] !=
-                          null) {
-                        return _serverErrors[
-                            'username'];
+                    validator: (value) {
+                      if (_serverErrors['username'] != null) {
+                        return _serverErrors['username'];
                       }
 
-                      if (value ==
-                              null ||
-                          value
-                              .trim()
-                              .isEmpty) {
+                      if (value == null || value.trim().isEmpty) {
                         return 'Введите логин';
                       }
 
                       return null;
                     },
                   ),
-
                   const SizedBox(
                     height: 14,
                   ),
-
                   TextFormField(
-                    controller:
-                        _fullName,
-
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Имя пользователя',
-                      border:
-                          OutlineInputBorder(),
+                    controller: _fullName,
+                    decoration: const InputDecoration(
+                      labelText: 'Имя пользователя',
+                      border: OutlineInputBorder(),
                     ),
-
                     onChanged: (_) {
                       setState(() {
-                        _serverErrors
-                            .remove(
+                        _serverErrors.remove(
                           'fullName',
                         );
                       });
                     },
-
-                    validator:
-                        (value) {
-                      if (_serverErrors[
-                              'fullName'] !=
-                          null) {
-                        return _serverErrors[
-                            'fullName'];
+                    validator: (value) {
+                      if (_serverErrors['fullName'] != null) {
+                        return _serverErrors['fullName'];
                       }
 
-                      if (value ==
-                              null ||
-                          value
-                              .trim()
-                              .isEmpty) {
+                      if (value == null || value.trim().isEmpty) {
                         return 'Введите имя';
                       }
 
-                      if (value
-                              .trim()
-                              .length >
-                          100) {
+                      if (value.trim().length > 100) {
                         return 'Имя не должно быть длиннее 100 символов';
                       }
 
                       return null;
                     },
                   ),
-
                   const SizedBox(
                     height: 14,
                   ),
-
                   TextFormField(
-                    controller:
-                        _password,
-
+                    controller: _password,
                     obscureText: true,
-
-                    decoration:
-                        const InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Пароль',
-                      border:
-                          OutlineInputBorder(),
+                      border: OutlineInputBorder(),
                     ),
-
                     onChanged: (_) {
                       setState(() {
-                        _serverErrors
-                            .remove(
+                        _serverErrors.remove(
                           'password',
                         );
                       });
                     },
-
-                    validator:
-                        (value) {
-                      if (_serverErrors[
-                              'password'] !=
-                          null) {
-                        return _serverErrors[
-                            'password'];
+                    validator: (value) {
+                      if (_serverErrors['password'] != null) {
+                        return _serverErrors['password'];
                       }
 
-                      if (value ==
-                              null ||
-                          value.isEmpty) {
+                      if (value == null || value.isEmpty) {
                         return 'Введите пароль';
                       }
 
@@ -340,72 +242,48 @@ class _RegisterScreenState
                       return null;
                     },
                   ),
-
                   const SizedBox(
                     height: 10,
                   ),
-
                   _requirement(
                     'Не менее 8 символов',
                     _lengthOk,
                   ),
-
                   _requirement(
                     'Есть цифра',
                     _digitOk,
                   ),
-
                   _requirement(
                     'Есть специальный символ',
                     _specialOk,
                   ),
-
                   const SizedBox(
                     height: 14,
                   ),
-
                   TextFormField(
-                    controller:
-                        _confirm,
-
+                    controller: _confirm,
                     obscureText: true,
-
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Повторите пароль',
-                      border:
-                          OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Повторите пароль',
+                      border: OutlineInputBorder(),
                     ),
-
-                    validator:
-                        (value) {
-                      if (value !=
-                          _password.text) {
+                    validator: (value) {
+                      if (value != _password.text) {
                         return 'Пароли не совпадают';
                       }
 
                       return null;
                     },
                   ),
-
                   const SizedBox(
                     height: 20,
                   ),
-
                   FilledButton(
-                    onPressed:
-                        _loading
-                            ? null
-                            : _register,
-
+                    onPressed: _loading ? null : _register,
                     child: Text(
-                      _loading
-                          ? 'Регистрация...'
-                          : 'Зарегистрироваться',
+                      _loading ? 'Регистрация...' : 'Зарегистрироваться',
                     ),
                   ),
-
                   TextButton(
                     onPressed: () {
                       context.go(

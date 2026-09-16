@@ -9,8 +9,7 @@ import '../models/product.dart';
 import '../models/product_query.dart';
 import 'product_repository.dart';
 
-class ApiProductRepository
-    implements ProductRepository {
+class ApiProductRepository implements ProductRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -24,17 +23,14 @@ class ApiProductRepository
   Map<String, dynamic> _listParameters(
     ProductQuery query,
   ) {
-    final params =
-        query.toApiQueryParameters();
+    final params = query.toApiQueryParameters();
 
     if (ApiConfig.apiDelayMs > 0) {
-      params['__delay'] =
-          ApiConfig.apiDelayMs;
+      params['__delay'] = ApiConfig.apiDelayMs;
     }
 
     if (ApiConfig.apiFailCode > 0) {
-      params['__fail'] =
-          ApiConfig.apiFailCode;
+      params['__fail'] = ApiConfig.apiFailCode;
     }
 
     return params;
@@ -53,16 +49,13 @@ class ApiProductRepository
     _findCancelToken = token;
 
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/products',
-        queryParameters:
-            _listParameters(query),
+        queryParameters: _listParameters(query),
         cancelToken: token,
       );
 
-      return PageResult<Product>
-          .fromJson(
+      return PageResult<Product>.fromJson(
         Map<String, dynamic>.from(
           response.data as Map,
         ),
@@ -80,8 +73,7 @@ class ApiProductRepository
 
   @override
   Future<List<Product>> all() async {
-    final response =
-        await _api.get(
+    final response = await _api.get(
       '/products',
       queryParameters: {
         'page': 1,
@@ -90,8 +82,7 @@ class ApiProductRepository
       },
     );
 
-    final page =
-        PageResult<Product>.fromJson(
+    final page = PageResult<Product>.fromJson(
       Map<String, dynamic>.from(
         response.data as Map,
       ),
@@ -106,8 +97,7 @@ class ApiProductRepository
     int id,
   ) async {
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/products/$id',
         queryParameters: {
           'includeDeleted': 'true',
@@ -130,8 +120,7 @@ class ApiProductRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/products',
           data: product.toJson(),
         );
@@ -207,23 +196,18 @@ class ApiProductRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/products/bulk-delete',
           data: {
             'ids': ids,
           },
         );
 
-        final data =
-            Map<String, dynamic>.from(
+        final data = Map<String, dynamic>.from(
           response.data as Map,
         );
 
-        return (data['deleted']
-                    as num?)
-                ?.toInt() ??
-            0;
+        return (data['deleted'] as num?)?.toInt() ?? 0;
       },
     );
   }

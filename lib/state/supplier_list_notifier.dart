@@ -7,22 +7,18 @@ import '../models/supplier.dart';
 import '../repositories/supplier_repository.dart';
 import 'load_status.dart';
 
-class SupplierListNotifier
-    extends ChangeNotifier {
+class SupplierListNotifier extends ChangeNotifier {
   final SupplierRepository _repository;
 
   SupplierListNotifier(
     this._repository,
   );
 
-  SimpleQuery _query =
-      const SimpleQuery();
+  SimpleQuery _query = const SimpleQuery();
 
-  PageResult<Supplier> _result =
-      PageResult<Supplier>.empty();
+  PageResult<Supplier> _result = PageResult<Supplier>.empty();
 
-  LoadStatus _status =
-      LoadStatus.idle;
+  LoadStatus _status = LoadStatus.idle;
 
   String? _error;
 
@@ -30,15 +26,13 @@ class SupplierListNotifier
 
   SimpleQuery get query => _query;
 
-  PageResult<Supplier> get result =>
-      _result;
+  PageResult<Supplier> get result => _result;
 
   LoadStatus get status => _status;
 
   String? get error => _error;
 
-  Set<int> get selected =>
-      Set.unmodifiable(_selected);
+  Set<int> get selected => Set.unmodifiable(_selected);
 
   Future<void> load() async {
     _status = LoadStatus.loading;
@@ -46,8 +40,7 @@ class SupplierListNotifier
     notifyListeners();
 
     try {
-      _result =
-          await _repository.find(
+      _result = await _repository.find(
         _query,
       );
 
@@ -58,8 +51,7 @@ class SupplierListNotifier
       _error = e.message;
       _status = LoadStatus.error;
     } catch (e) {
-      _error =
-          'Неизвестная ошибка: $e';
+      _error = 'Неизвестная ошибка: $e';
 
       _status = LoadStatus.error;
     }
@@ -90,15 +82,12 @@ class SupplierListNotifier
     return _repository.all();
   }
 
-  Future<List<Supplier>>
-      getAllActive() async {
-    final values =
-        await _repository.all();
+  Future<List<Supplier>> getAllActive() async {
+    final values = await _repository.all();
 
     return values
         .where(
-          (item) =>
-              !item.isDeleted,
+          (item) => !item.isDeleted,
         )
         .toList();
   }
@@ -112,8 +101,7 @@ class SupplierListNotifier
   Future<Supplier> create(
     Supplier supplier,
   ) async {
-    final created =
-        await _repository.create(
+    final created = await _repository.create(
       supplier,
     );
 

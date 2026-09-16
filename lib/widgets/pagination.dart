@@ -24,20 +24,16 @@ class Pagination extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      crossAxisAlignment:
-          WrapCrossAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.center,
       children: [
         IconButton(
           tooltip: 'Первая страница',
-          onPressed: page > 1
-              ? () => onPageChanged(1)
-              : null,
+          onPressed: page > 1 ? () => onPageChanged(1) : null,
           icon: const Icon(
             Icons.first_page,
           ),
         ),
-
         IconButton(
           tooltip: 'Предыдущая страница',
           onPressed: page > 1
@@ -49,11 +45,9 @@ class Pagination extends StatelessWidget {
             Icons.chevron_left,
           ),
         ),
-
         Text(
           'Страница $page из $totalPages',
         ),
-
         IconButton(
           tooltip: 'Следующая страница',
           onPressed: page < totalPages
@@ -65,7 +59,6 @@ class Pagination extends StatelessWidget {
             Icons.chevron_right,
           ),
         ),
-
         IconButton(
           tooltip: 'Последняя страница',
           onPressed: page < totalPages
@@ -77,17 +70,12 @@ class Pagination extends StatelessWidget {
             Icons.last_page,
           ),
         ),
-
         const SizedBox(width: 12),
-
         Text(
           'Всего записей: $total',
         ),
-
         const SizedBox(width: 12),
-
         const Text('На странице:'),
-
         DropdownButton<int>(
           value: size,
           items: const [

@@ -23,8 +23,7 @@ class LoyaltyCard {
       number: number ?? this.number,
       level: level ?? this.level,
       points: points ?? this.points,
-      issuedAt:
-          issuedAt ?? this.issuedAt,
+      issuedAt: issuedAt ?? this.issuedAt,
     );
   }
 
@@ -33,8 +32,7 @@ class LoyaltyCard {
       'number': number,
       'level': level,
       'points': points,
-      'issuedAt':
-          issuedAt.toIso8601String(),
+      'issuedAt': issuedAt.toIso8601String(),
     };
   }
 
@@ -42,18 +40,14 @@ class LoyaltyCard {
     Map<String, dynamic> json,
   ) {
     return LoyaltyCard(
-      number:
-          jsonString(json, 'number'),
+      number: jsonString(json, 'number'),
       level: jsonString(
         json,
         'level',
         fallback: 'Silver',
       ),
-      points:
-          jsonInt(json, 'points'),
-      issuedAt:
-          jsonDate(json, 'issuedAt') ??
-              DateTime.now(),
+      points: jsonInt(json, 'points'),
+      issuedAt: jsonDate(json, 'issuedAt') ?? DateTime.now(),
     );
   }
 }
@@ -81,8 +75,7 @@ class Customer {
 
   bool get isDeleted => deletedAt != null;
 
-  String get fullName =>
-      '$lastName $firstName';
+  String get fullName => '$lastName $firstName';
 
   Customer copyWith({
     int? id,
@@ -96,17 +89,12 @@ class Customer {
   }) {
     return Customer(
       id: id ?? this.id,
-      firstName:
-          firstName ?? this.firstName,
-      lastName:
-          lastName ?? this.lastName,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
-      loyaltyCard:
-          loyaltyCard ?? this.loyaltyCard,
-      deletedAt: clearDeletedAt
-          ? null
-          : (deletedAt ?? this.deletedAt),
+      loyaltyCard: loyaltyCard ?? this.loyaltyCard,
+      deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
     );
   }
 
@@ -117,18 +105,15 @@ class Customer {
       'lastName': lastName,
       'email': email,
       'phone': phone,
-      'loyaltyCard':
-          loyaltyCard.toJson(),
-      'deletedAt':
-          deletedAt?.toIso8601String(),
+      'loyaltyCard': loyaltyCard.toJson(),
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
   factory Customer.fromJson(
     Map<String, dynamic> json,
   ) {
-    final rawCard =
-        json['loyaltyCard'];
+    final rawCard = json['loyaltyCard'];
 
     final cardMap = rawCard is Map
         ? Map<String, dynamic>.from(
@@ -138,16 +123,12 @@ class Customer {
 
     return Customer(
       id: jsonInt(json, 'id'),
-      firstName:
-          jsonString(json, 'firstName'),
-      lastName:
-          jsonString(json, 'lastName'),
+      firstName: jsonString(json, 'firstName'),
+      lastName: jsonString(json, 'lastName'),
       email: jsonString(json, 'email'),
       phone: jsonString(json, 'phone'),
-      loyaltyCard:
-          LoyaltyCard.fromJson(cardMap),
-      deletedAt:
-          jsonDate(json, 'deletedAt'),
+      loyaltyCard: LoyaltyCard.fromJson(cardMap),
+      deletedAt: jsonDate(json, 'deletedAt'),
     );
   }
 }

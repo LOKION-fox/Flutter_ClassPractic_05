@@ -7,8 +7,10 @@ import 'models/product_query.dart';
 import 'models/simple_query.dart';
 
 import 'screens/account_screen.dart';
-import 'screens/admin_stats_screen.dart';
-import 'screens/admin_users_screen.dart';
+import 'screens/admin_stats_screen.dart'
+    deferred as admin_stats_screen;
+import 'screens/admin_users_screen.dart'
+    deferred as admin_users_screen;
 import 'screens/animal_details_screen.dart';
 import 'screens/animal_form_screen.dart';
 import 'screens/animal_list_screen.dart';
@@ -32,6 +34,9 @@ import 'screens/supplier_list_screen.dart';
 
 import 'state/auth_notifier.dart';
 
+import 'widgets/adaptive_app_shell.dart';
+import 'widgets/deferred_screen.dart';
+
 GoRouter buildRouter(
   AuthNotifier auth,
 ) {
@@ -43,9 +48,17 @@ GoRouter buildRouter(
         : '/forbidden';
   }
 
+  int parseId(
+    GoRouterState state,
+  ) {
+    return int.tryParse(
+          state.pathParameters['id'] ?? '',
+        ) ??
+        -1;
+  }
+
   return GoRouter(
     refreshListenable: auth,
-
     initialLocation: '/',
 
     redirect: (
@@ -81,15 +94,20 @@ GoRouter buildRouter(
     },
 
     routes: [
+      // ======================================================
+      // PUBLIC
+      // ======================================================
+
       GoRoute(
         path: '/login',
 
-        builder:
-            (context, state) {
+        builder: (
+          context,
+          state,
+        ) {
           return LoginScreen(
             from:
-                state.uri
-                    .queryParameters[
+                state.uri.queryParameters[
               'from'
             ],
           );
@@ -99,624 +117,749 @@ GoRouter buildRouter(
       GoRoute(
         path: '/register',
 
-        builder:
-            (context, state) {
+        builder: (
+          context,
+          state,
+        ) {
           return const RegisterScreen();
         },
       ),
 
-      GoRoute(
-        path: '/forbidden',
+      // ======================================================
+      // AUTHORIZED APPLICATION
+      // ======================================================
 
-        builder:
-            (context, state) {
-          return const ForbiddenScreen();
-        },
-      ),
+      ShellRoute(
+        builder: (
+          context,
+          state,
+          child,
+        ) {
+          return AdaptiveAppShell(
+            currentLocation:
+                state.uri.path,
 
-      GoRoute(
-        path: '/',
-
-        builder:
-            (context, state) {
-          return const HomeScreen();
-        },
-      ),
-
-      // ---------------------------
-      // CUSTOMER ONLY
-      // ---------------------------
-
-      GoRoute(
-        path: '/account',
-
-        redirect:
-            (context, state) {
-          return auth.isUiRole(
-            AppRole.customer,
-          )
-              ? null
-              : '/forbidden';
+            child: child,
+          );
         },
 
-        builder:
-            (context, state) {
-          return const AccountScreen();
-        },
-      ),
+        routes: [
+          // ==================================================
+          // FORBIDDEN
+          // ==================================================
 
-      // ---------------------------
-      // MANAGER / ADMIN
-      // ---------------------------
+          GoRoute(
+            path: '/forbidden',
 
-      GoRoute(
-        path: '/management',
+            builder: (
+              context,
+              state,
+            ) {
+              return const ForbiddenScreen();
+            },
+          ),
 
-        redirect:
-            (context, state) {
-          return auth.isUiRole(
+          // ==================================================
+          // HOME
+          // ==================================================
+
+          GoRoute(
+            path: '/',
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const HomeScreen();
+            },
+          ),
+
+          // ==================================================
+          // ACCOUNT
+          // ==================================================
+
+          GoRoute(
+            path: '/account',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return auth.isUiRole(
+                AppRole.customer,
+              )
+                  ? null
+                  : '/forbidden';
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const AccountScreen();
+            },
+          ),
+
+          // ==================================================
+          // MANAGEMENT
+          // ==================================================
+
+          GoRoute(
+            path: '/management',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              final allowed =
+                  auth.isUiRole(
                     AppRole.manager,
                   ) ||
                   auth.isUiRole(
                     AppRole.admin,
-                  )
-              ? null
-              : '/forbidden';
-        },
-
-        builder:
-            (context, state) {
-          return const ManagementScreen();
-        },
-      ),
-
-      // ---------------------------
-      // ADMIN ONLY
-      // ---------------------------
-
-      GoRoute(
-        path: '/admin/users',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission.manageUsers,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const AdminUsersScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/admin/stats',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .viewStatistics,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const AdminStatsScreen();
-        },
-      ),
-
-      // ---------------------------
-      // PRODUCTS
-      // ---------------------------
-
-      GoRoute(
-        path: '/products',
-
-        builder:
-            (context, state) {
-          return ProductListScreen(
-            key: ValueKey(
-              state.uri.toString(),
-            ),
-
-            initialQuery:
-                ProductQuery
-                    .fromUri(
-              state.uri,
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/products/new',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCatalog,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const ProductFormScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/products/:id/edit',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCatalog,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return ProductFormScreen(
-            id: int.tryParse(
-              state.pathParameters[
-                      'id'] ??
-                  '',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/products/:id',
-
-        builder:
-            (context, state) {
-          return ProductDetailsScreen(
-            id: int.tryParse(
-                  state.pathParameters[
-                          'id'] ??
-                      '',
-                ) ??
-                -1,
-          );
-        },
-      ),
-
-      // ---------------------------
-      // ANIMALS
-      // ---------------------------
-
-      GoRoute(
-        path: '/animals',
-
-        builder:
-            (context, state) {
-          return AnimalListScreen(
-            key: ValueKey(
-              state.uri.toString(),
-            ),
-
-            initialQuery:
-                AnimalQuery.fromUri(
-              state.uri,
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/animals/new',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCatalog,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const AnimalFormScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/animals/:id/edit',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCatalog,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return AnimalFormScreen(
-            id: int.tryParse(
-              state.pathParameters[
-                      'id'] ??
-                  '',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/animals/:id',
-
-        builder:
-            (context, state) {
-          return AnimalDetailsScreen(
-            id: int.tryParse(
-                  state.pathParameters[
-                          'id'] ??
-                      '',
-                ) ??
-                -1,
-          );
-        },
-      ),
-
-      // ---------------------------
-      // CATEGORIES
-      // ---------------------------
-
-      GoRoute(
-        path: '/categories',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CategoryListScreen(
-            key: ValueKey(
-              state.uri.toString(),
-            ),
-
-            initialQuery:
-                SimpleQuery.fromUri(
-              state.uri,
-
-              filterParam:
-                  'kind',
-
-              allowedSortFields: {
-                'name',
-                'kind',
-                'id',
-              },
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/categories/new',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const CategoryFormScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/categories/:id/edit',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CategoryFormScreen(
-            id: int.tryParse(
-              state.pathParameters[
-                      'id'] ??
-                  '',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/categories/:id',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CategoryDetailsScreen(
-            id: int.tryParse(
-                  state.pathParameters[
-                          'id'] ??
-                      '',
-                ) ??
-                -1,
-          );
-        },
-      ),
-
-      // ---------------------------
-      // SUPPLIERS
-      // ---------------------------
-
-      GoRoute(
-        path: '/suppliers',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return SupplierListScreen(
-            key: ValueKey(
-              state.uri.toString(),
-            ),
-
-            initialQuery:
-                SimpleQuery.fromUri(
-              state.uri,
-
-              filterParam:
-                  'country',
-
-              allowedSortFields: {
-                'name',
-                'country',
-                'id',
-              },
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/suppliers/new',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const SupplierFormScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/suppliers/:id/edit',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return SupplierFormScreen(
-            id: int.tryParse(
-              state.pathParameters[
-                      'id'] ??
-                  '',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/suppliers/:id',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageReferences,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return SupplierDetailsScreen(
-            id: int.tryParse(
-                  state.pathParameters[
-                          'id'] ??
-                      '',
-                ) ??
-                -1,
-          );
-        },
-      ),
-
-      // ---------------------------
-      // CUSTOMERS
-      // ---------------------------
-
-      GoRoute(
-        path: '/customers',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCustomers,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CustomerListScreen(
-            key: ValueKey(
-              state.uri.toString(),
-            ),
-
-            initialQuery:
-                SimpleQuery.fromUri(
-              state.uri,
-
-              filterParam:
-                  'level',
-
-              allowedSortFields: {
-                'lastName',
-                'email',
-                'points',
-              },
-
-              defaultSort:
-                  'lastName',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/customers/new',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCustomers,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return const CustomerFormScreen();
-        },
-      ),
-
-      GoRoute(
-        path: '/customers/:id/edit',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCustomers,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CustomerFormScreen(
-            id: int.tryParse(
-              state.pathParameters[
-                      'id'] ??
-                  '',
-            ),
-          );
-        },
-      ),
-
-      GoRoute(
-        path: '/customers/:id',
-
-        redirect:
-            (context, state) {
-          return requirePermission(
-            AppPermission
-                .manageCustomers,
-          );
-        },
-
-        builder:
-            (context, state) {
-          return CustomerDetailsScreen(
-            id: int.tryParse(
-                  state.pathParameters[
-                          'id'] ??
-                      '',
-                ) ??
-                -1,
-          );
-        },
+                  );
+
+              return allowed
+                  ? null
+                  : '/forbidden';
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const ManagementScreen();
+            },
+          ),
+
+          // ==================================================
+          // ADMIN USERS
+          // ==================================================
+
+          GoRoute(
+            path: '/admin/users',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission.manageUsers,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return DeferredScreen(
+                loadLibrary:
+                    admin_users_screen
+                        .loadLibrary,
+
+                builder: () {
+                  // Важно:
+                  // deferred-библиотека
+                  // не используется через const.
+                  return admin_users_screen
+                      .AdminUsersScreen();
+                },
+              );
+            },
+          ),
+
+          // ==================================================
+          // ADMIN STATISTICS
+          // ==================================================
+
+          GoRoute(
+            path: '/admin/stats',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .viewStatistics,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return DeferredScreen(
+                loadLibrary:
+                    admin_stats_screen
+                        .loadLibrary,
+
+                builder: () {
+                  // Важно:
+                  // deferred-библиотека
+                  // не используется через const.
+                  return admin_stats_screen
+                      .AdminStatsScreen();
+                },
+              );
+            },
+          ),
+
+          // ==================================================
+          // PRODUCTS
+          // ==================================================
+
+          GoRoute(
+            path: '/products',
+
+            builder: (
+              context,
+              state,
+            ) {
+              return ProductListScreen(
+                key: ValueKey(
+                  state.uri.toString(),
+                ),
+
+                initialQuery:
+                    ProductQuery.fromUri(
+                  state.uri,
+                ),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/products/new',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCatalog,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const ProductFormScreen();
+            },
+          ),
+
+          GoRoute(
+            path:
+                '/products/:id/edit',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCatalog,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return ProductFormScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/products/:id',
+
+            builder: (
+              context,
+              state,
+            ) {
+              return ProductDetailsScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          // ==================================================
+          // ANIMALS
+          // ==================================================
+
+          GoRoute(
+            path: '/animals',
+
+            builder: (
+              context,
+              state,
+            ) {
+              return AnimalListScreen(
+                key: ValueKey(
+                  state.uri.toString(),
+                ),
+
+                initialQuery:
+                    AnimalQuery.fromUri(
+                  state.uri,
+                ),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/animals/new',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCatalog,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const AnimalFormScreen();
+            },
+          ),
+
+          GoRoute(
+            path:
+                '/animals/:id/edit',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCatalog,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return AnimalFormScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/animals/:id',
+
+            builder: (
+              context,
+              state,
+            ) {
+              return AnimalDetailsScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          // ==================================================
+          // CATEGORIES
+          // ==================================================
+
+          GoRoute(
+            path: '/categories',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CategoryListScreen(
+                key: ValueKey(
+                  state.uri.toString(),
+                ),
+
+                initialQuery:
+                    SimpleQuery.fromUri(
+                  state.uri,
+
+                  filterParam: 'kind',
+
+                  allowedSortFields: {
+                    'name',
+                    'kind',
+                    'id',
+                  },
+                ),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/categories/new',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const CategoryFormScreen();
+            },
+          ),
+
+          GoRoute(
+            path:
+                '/categories/:id/edit',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CategoryFormScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/categories/:id',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CategoryDetailsScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          // ==================================================
+          // SUPPLIERS
+          // ==================================================
+
+          GoRoute(
+            path: '/suppliers',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return SupplierListScreen(
+                key: ValueKey(
+                  state.uri.toString(),
+                ),
+
+                initialQuery:
+                    SimpleQuery.fromUri(
+                  state.uri,
+
+                  filterParam:
+                      'country',
+
+                  allowedSortFields: {
+                    'name',
+                    'country',
+                    'id',
+                  },
+                ),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/suppliers/new',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const SupplierFormScreen();
+            },
+          ),
+
+          GoRoute(
+            path:
+                '/suppliers/:id/edit',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return SupplierFormScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/suppliers/:id',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageReferences,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return SupplierDetailsScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          // ==================================================
+          // CUSTOMERS
+          // ==================================================
+
+          GoRoute(
+            path: '/customers',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCustomers,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CustomerListScreen(
+                key: ValueKey(
+                  state.uri.toString(),
+                ),
+
+                initialQuery:
+                    SimpleQuery.fromUri(
+                  state.uri,
+
+                  filterParam: 'level',
+
+                  allowedSortFields: {
+                    'lastName',
+                    'email',
+                    'points',
+                  },
+
+                  defaultSort:
+                      'lastName',
+                ),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/customers/new',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCustomers,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return const CustomerFormScreen();
+            },
+          ),
+
+          GoRoute(
+            path:
+                '/customers/:id/edit',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCustomers,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CustomerFormScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+
+          GoRoute(
+            path: '/customers/:id',
+
+            redirect: (
+              context,
+              state,
+            ) {
+              return requirePermission(
+                AppPermission
+                    .manageCustomers,
+              );
+            },
+
+            builder: (
+              context,
+              state,
+            ) {
+              return CustomerDetailsScreen(
+                id: parseId(state),
+              );
+            },
+          ),
+        ],
       ),
     ],
 
-    errorBuilder:
-        (context, state) {
+    // ========================================================
+    // 404
+    // ========================================================
+
+    errorBuilder: (
+      context,
+      state,
+    ) {
       return Scaffold(
         appBar: AppBar(
-          title:
-              const Text('Ошибка 404'),
+          title: const Text(
+            'Ошибка 404',
+          ),
         ),
 
         body: Center(
-          child: Column(
-            mainAxisSize:
-                MainAxisSize.min,
+          child: Padding(
+            padding:
+                const EdgeInsets.all(
+              24,
+            ),
 
-            children: [
-              const Text(
-                '404',
-                style: TextStyle(
-                  fontSize: 60,
+            child: Column(
+              mainAxisSize:
+                  MainAxisSize.min,
+
+              children: [
+                const Text(
+                  '404',
+
+                  style: TextStyle(
+                    fontSize: 60,
+                  ),
                 ),
-              ),
 
-              const Text(
-                'Страница не найдена',
-              ),
-
-              const SizedBox(
-                height: 20,
-              ),
-
-              FilledButton(
-                onPressed: () {
-                  context.go('/');
-                },
-
-                child:
-                    const Text(
-                  'На главную',
+                const Text(
+                  'Страница не найдена',
                 ),
-              ),
-            ],
+
+                const SizedBox(
+                  height: 20,
+                ),
+
+                FilledButton(
+                  onPressed: () {
+                    context.go('/');
+                  },
+
+                  child: const Text(
+                    'На главную',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );

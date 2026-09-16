@@ -8,8 +8,7 @@ import '../models/simple_query.dart';
 import '../models/supplier.dart';
 import 'supplier_repository.dart';
 
-class ApiSupplierRepository
-    implements SupplierRepository {
+class ApiSupplierRepository implements SupplierRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -24,15 +23,11 @@ class ApiSupplierRepository
   );
 
   bool get _cacheIsValid {
-    if (_cache == null ||
-        _cacheTime == null) {
+    if (_cache == null || _cacheTime == null) {
       return false;
     }
 
-    return DateTime.now()
-            .difference(_cacheTime!)
-            .inMinutes <
-        5;
+    return DateTime.now().difference(_cacheTime!).inMinutes < 5;
   }
 
   void _clearCache() {
@@ -51,18 +46,15 @@ class ApiSupplierRepository
     _findCancelToken = token;
 
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/suppliers',
-        queryParameters:
-            query.toApiQueryParameters(
+        queryParameters: query.toApiQueryParameters(
           filterParam: 'country',
         ),
         cancelToken: token,
       );
 
-      return PageResult<Supplier>
-          .fromJson(
+      return PageResult<Supplier>.fromJson(
         Map<String, dynamic>.from(
           response.data as Map,
         ),
@@ -84,8 +76,7 @@ class ApiSupplierRepository
       return [..._cache!];
     }
 
-    final response =
-        await _api.get(
+    final response = await _api.get(
       '/suppliers',
       queryParameters: {
         'page': 1,
@@ -95,8 +86,7 @@ class ApiSupplierRepository
       },
     );
 
-    final result =
-        PageResult<Supplier>.fromJson(
+    final result = PageResult<Supplier>.fromJson(
       Map<String, dynamic>.from(
         response.data as Map,
       ),
@@ -114,8 +104,7 @@ class ApiSupplierRepository
     int id,
   ) async {
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/suppliers/$id',
         queryParameters: {
           'includeDeleted': 'true',
@@ -138,8 +127,7 @@ class ApiSupplierRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/suppliers',
           data: supplier.toJson(),
         );
@@ -225,8 +213,7 @@ class ApiSupplierRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/suppliers/bulk-delete',
           data: {
             'ids': ids,
@@ -235,11 +222,7 @@ class ApiSupplierRepository
 
         _clearCache();
 
-        return (response
-                    .data['deleted']
-                as num?)
-            ?.toInt() ??
-            0;
+        return (response.data['deleted'] as num?)?.toInt() ?? 0;
       },
     );
   }

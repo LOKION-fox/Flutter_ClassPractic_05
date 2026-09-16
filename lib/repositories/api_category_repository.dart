@@ -8,8 +8,7 @@ import '../models/page_result.dart';
 import '../models/simple_query.dart';
 import 'category_repository.dart';
 
-class ApiCategoryRepository
-    implements CategoryRepository {
+class ApiCategoryRepository implements CategoryRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -24,15 +23,11 @@ class ApiCategoryRepository
   );
 
   bool get _cacheIsValid {
-    if (_cache == null ||
-        _cacheTime == null) {
+    if (_cache == null || _cacheTime == null) {
       return false;
     }
 
-    return DateTime.now()
-            .difference(_cacheTime!)
-            .inMinutes <
-        5;
+    return DateTime.now().difference(_cacheTime!).inMinutes < 5;
   }
 
   void _clearCache() {
@@ -51,18 +46,15 @@ class ApiCategoryRepository
     _findCancelToken = token;
 
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/categories',
-        queryParameters:
-            query.toApiQueryParameters(
+        queryParameters: query.toApiQueryParameters(
           filterParam: 'kind',
         ),
         cancelToken: token,
       );
 
-      return PageResult<Category>
-          .fromJson(
+      return PageResult<Category>.fromJson(
         Map<String, dynamic>.from(
           response.data as Map,
         ),
@@ -84,8 +76,7 @@ class ApiCategoryRepository
       return [..._cache!];
     }
 
-    final response =
-        await _api.get(
+    final response = await _api.get(
       '/categories',
       queryParameters: {
         'page': 1,
@@ -95,8 +86,7 @@ class ApiCategoryRepository
       },
     );
 
-    final result =
-        PageResult<Category>.fromJson(
+    final result = PageResult<Category>.fromJson(
       Map<String, dynamic>.from(
         response.data as Map,
       ),
@@ -114,8 +104,7 @@ class ApiCategoryRepository
     int id,
   ) async {
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/categories/$id',
         queryParameters: {
           'includeDeleted': 'true',
@@ -138,8 +127,7 @@ class ApiCategoryRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/categories',
           data: category.toJson(),
         );
@@ -225,8 +213,7 @@ class ApiCategoryRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/categories/bulk-delete',
           data: {
             'ids': ids,
@@ -235,11 +222,7 @@ class ApiCategoryRepository
 
         _clearCache();
 
-        return (response
-                    .data['deleted']
-                as num?)
-            ?.toInt() ??
-            0;
+        return (response.data['deleted'] as num?)?.toInt() ?? 0;
       },
     );
   }

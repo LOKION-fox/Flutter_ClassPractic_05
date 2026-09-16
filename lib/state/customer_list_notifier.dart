@@ -7,24 +7,20 @@ import '../models/simple_query.dart';
 import '../repositories/customer_repository.dart';
 import 'load_status.dart';
 
-class CustomerListNotifier
-    extends ChangeNotifier {
+class CustomerListNotifier extends ChangeNotifier {
   final CustomerRepository _repository;
 
   CustomerListNotifier(
     this._repository,
   );
 
-  SimpleQuery _query =
-      const SimpleQuery(
+  SimpleQuery _query = const SimpleQuery(
     sortField: 'lastName',
   );
 
-  PageResult<Customer> _result =
-      PageResult<Customer>.empty();
+  PageResult<Customer> _result = PageResult<Customer>.empty();
 
-  LoadStatus _status =
-      LoadStatus.idle;
+  LoadStatus _status = LoadStatus.idle;
 
   String? _error;
 
@@ -32,15 +28,13 @@ class CustomerListNotifier
 
   SimpleQuery get query => _query;
 
-  PageResult<Customer> get result =>
-      _result;
+  PageResult<Customer> get result => _result;
 
   LoadStatus get status => _status;
 
   String? get error => _error;
 
-  Set<int> get selected =>
-      Set.unmodifiable(_selected);
+  Set<int> get selected => Set.unmodifiable(_selected);
 
   Future<void> load() async {
     _status = LoadStatus.loading;
@@ -49,8 +43,7 @@ class CustomerListNotifier
     notifyListeners();
 
     try {
-      _result =
-          await _repository.find(
+      _result = await _repository.find(
         _query,
       );
 
@@ -61,8 +54,7 @@ class CustomerListNotifier
       _error = e.message;
       _status = LoadStatus.error;
     } catch (e) {
-      _error =
-          'Неизвестная ошибка: $e';
+      _error = 'Неизвестная ошибка: $e';
 
       _status = LoadStatus.error;
     }
@@ -98,8 +90,7 @@ class CustomerListNotifier
   Future<Customer> create(
     Customer customer,
   ) async {
-    final created =
-        await _repository.create(
+    final created = await _repository.create(
       customer,
     );
 

@@ -29,12 +29,10 @@ class ProductListScreen extends StatefulWidget {
   });
 
   @override
-  State<ProductListScreen> createState() =>
-      _ProductListScreenState();
+  State<ProductListScreen> createState() => _ProductListScreenState();
 }
 
-class _ProductListScreenState
-    extends State<ProductListScreen> {
+class _ProductListScreenState extends State<ProductListScreen> {
   List<Category> _categories = [];
   List<Supplier> _suppliers = [];
 
@@ -44,20 +42,16 @@ class _ProductListScreenState
 
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        await context
-            .read<ProductListNotifier>()
-            .applyQuery(
+        await context.read<ProductListNotifier>().applyQuery(
               widget.initialQuery,
             );
 
         try {
-          final categories = await context
-              .read<CategoryListNotifier>()
-              .getAllActive();
+          final categories =
+              await context.read<CategoryListNotifier>().getAllActive();
 
-          final suppliers = await context
-              .read<SupplierListNotifier>()
-              .getAllActive();
+          final suppliers =
+              await context.read<SupplierListNotifier>().getAllActive();
 
           if (!mounted) {
             return;
@@ -101,9 +95,7 @@ class _ProductListScreenState
   ) async {
     final confirmed = await confirmDialog(
       context,
-      title: hard
-          ? 'Физическое удаление'
-          : 'Удаление',
+      title: hard ? 'Физическое удаление' : 'Удаление',
       message: hard
           ? 'Удалить товар «${product.name}» '
               'навсегда? Восстановить его '
@@ -116,8 +108,7 @@ class _ProductListScreenState
       return;
     }
 
-    final notifier =
-        context.read<ProductListNotifier>();
+    final notifier = context.read<ProductListNotifier>();
 
     try {
       if (hard) {
@@ -155,8 +146,7 @@ class _ProductListScreenState
   Future<void> _restore(
     Product product,
   ) async {
-    final notifier =
-        context.read<ProductListNotifier>();
+    final notifier = context.read<ProductListNotifier>();
 
     try {
       await notifier.restore(
@@ -222,14 +212,11 @@ class _ProductListScreenState
   Widget build(
     BuildContext context,
   ) {
-    final notifier =
-        context.watch<ProductListNotifier>();
+    final notifier = context.watch<ProductListNotifier>();
 
-    final auth =
-        context.watch<AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final query =
-        widget.initialQuery;
+    final query = widget.initialQuery;
 
     final canManage = auth.can(
       AppPermission.manageCatalog,
@@ -246,9 +233,7 @@ class _ProductListScreenState
     // Если пользователь не имеет права
     // управлять каталогом, выбранные строки
     // ему вообще не показываем.
-    final selected = canManage
-        ? notifier.selected
-        : const <int>{};
+    final selected = canManage ? notifier.selected : const <int>{};
 
     return EntityListScaffold<Product>(
       title: 'Товары',
@@ -258,15 +243,13 @@ class _ProductListScreenState
         categories: _categories,
         suppliers: _suppliers,
         onChanged: _change,
-        showDeletedToggle:
-            canManage,
+        showDeletedToggle: canManage,
       ),
 
       status: notifier.status,
       error: notifier.error,
 
-      items:
-          notifier.result.items,
+      items: notifier.result.items,
 
       selected: selected,
 
@@ -275,90 +258,62 @@ class _ProductListScreenState
       // ======================================================
 
       table: EntityTable<Product>(
-        items:
-            notifier.result.items,
-
-        idOf: (product) =>
-            product.id,
-
+        items: notifier.result.items,
+        idOf: (product) => product.id,
         selected: selected,
-
-        selectionEnabled:
-            canManage,
-
-        onToggleSelect:
-            notifier.toggleSelection,
-
-        sortField:
-            query.sortField,
-
-        sortAscending:
-            query.sortAscending,
-
+        selectionEnabled: canManage,
+        onToggleSelect: notifier.toggleSelection,
+        sortField: query.sortField,
+        sortAscending: query.sortAscending,
         onSort: (field) {
           _change(
             query.copyWith(
               sortField: field,
-
               sortAscending:
-                  field ==
-                          query.sortField
-                      ? !query
-                          .sortAscending
-                      : true,
+                  field == query.sortField ? !query.sortAscending : true,
             ),
           );
         },
-
         columns: [
           TableColumnSpec<Product>(
             label: 'Название',
             sortField: 'name',
-
             build: (product) {
               return Text(
                 product.name,
               );
             },
           ),
-
           TableColumnSpec<Product>(
             label: 'Артикул',
-
             build: (product) {
               return Text(
                 product.article,
               );
             },
           ),
-
           TableColumnSpec<Product>(
             label: 'Бренд',
-
             build: (product) {
               return Text(
                 product.brand,
               );
             },
           ),
-
           TableColumnSpec<Product>(
             label: 'Цена',
             sortField: 'price',
             numeric: true,
-
             build: (product) {
               return Text(
                 '${product.price.toStringAsFixed(0)} ₽',
               );
             },
           ),
-
           TableColumnSpec<Product>(
             label: 'Остаток',
             sortField: 'stock',
             numeric: true,
-
             build: (product) {
               return Text(
                 '${product.stock}',
@@ -366,18 +321,15 @@ class _ProductListScreenState
             },
           ),
         ],
-
         actions: (product) {
           return [
             // Просмотр доступен всем
             // авторизованным пользователям.
             IconButton(
               tooltip: 'Просмотр',
-
               icon: const Icon(
                 Icons.visibility,
               ),
-
               onPressed: () {
                 context.push(
                   '/products/${product.id}',
@@ -387,16 +339,12 @@ class _ProductListScreenState
 
             // Редактировать может
             // manager или admin.
-            if (canManage &&
-                !product.isDeleted)
+            if (canManage && !product.isDeleted)
               IconButton(
-                tooltip:
-                    'Редактировать',
-
+                tooltip: 'Редактировать',
                 icon: const Icon(
                   Icons.edit,
                 ),
-
                 onPressed: () {
                   context.push(
                     '/products/'
@@ -407,16 +355,12 @@ class _ProductListScreenState
 
             // Логическое удаление:
             // manager или admin.
-            if (canManage &&
-                !product.isDeleted)
+            if (canManage && !product.isDeleted)
               IconButton(
-                tooltip:
-                    'Логически удалить',
-
+                tooltip: 'Логически удалить',
                 icon: const Icon(
                   Icons.delete_outline,
                 ),
-
                 onPressed: () {
                   _delete(
                     product,
@@ -427,16 +371,12 @@ class _ProductListScreenState
 
             // Восстановление:
             // только admin.
-            if (canRestore &&
-                product.isDeleted)
+            if (canRestore && product.isDeleted)
               IconButton(
-                tooltip:
-                    'Восстановить',
-
+                tooltip: 'Восстановить',
                 icon: const Icon(
                   Icons.restore,
                 ),
-
                 onPressed: () {
                   _restore(
                     product,
@@ -448,13 +388,10 @@ class _ProductListScreenState
             // только admin.
             if (canHardDelete)
               IconButton(
-                tooltip:
-                    'Удалить навсегда',
-
+                tooltip: 'Удалить навсегда',
                 icon: const Icon(
                   Icons.delete_forever,
                 ),
-
                 onPressed: () {
                   _delete(
                     product,
@@ -471,26 +408,20 @@ class _ProductListScreenState
       // ======================================================
 
       cardBuilder: (product) {
-        final hasActions =
-            (canManage &&
-                    !product.isDeleted) ||
-                (canRestore &&
-                    product.isDeleted) ||
-                canHardDelete;
+        final hasActions = (canManage && !product.isDeleted) ||
+            (canRestore && product.isDeleted) ||
+            canHardDelete;
 
         return Card(
           child: ListTile(
             leading: Icon(
               product.isDeleted
-                  ? Icons
-                      .remove_shopping_cart
+                  ? Icons.remove_shopping_cart
                   : Icons.shopping_bag,
             ),
-
             title: Text(
               product.name,
             ),
-
             subtitle: Text(
               'Артикул: '
               '${product.article}\n'
@@ -502,15 +433,12 @@ class _ProductListScreenState
               '${product.stock}'
               '${product.isDeleted ? '\nУдалён' : ''}',
             ),
-
             isThreeLine: true,
-
             onTap: () {
               context.push(
                 '/products/${product.id}',
               );
             },
-
             trailing: hasActions
                 ? PopupMenuButton<String>(
                     onSelected: (value) {
@@ -519,16 +447,11 @@ class _ProductListScreenState
                         product,
                       );
                     },
-
-                    itemBuilder:
-                        (context) {
+                    itemBuilder: (context) {
                       return [
-                        if (canManage &&
-                            !product
-                                .isDeleted)
+                        if (canManage && !product.isDeleted)
                           const PopupMenuItem(
                             value: 'edit',
-
                             child: ListTile(
                               leading: Icon(
                                 Icons.edit,
@@ -538,31 +461,21 @@ class _ProductListScreenState
                               ),
                             ),
                           ),
-
-                        if (canManage &&
-                            !product
-                                .isDeleted)
+                        if (canManage && !product.isDeleted)
                           const PopupMenuItem(
-                            value:
-                                'softDelete',
-
+                            value: 'softDelete',
                             child: ListTile(
                               leading: Icon(
-                                Icons
-                                    .delete_outline,
+                                Icons.delete_outline,
                               ),
                               title: Text(
                                 'Удалить',
                               ),
                             ),
                           ),
-
-                        if (canRestore &&
-                            product
-                                .isDeleted)
+                        if (canRestore && product.isDeleted)
                           const PopupMenuItem(
                             value: 'restore',
-
                             child: ListTile(
                               leading: Icon(
                                 Icons.restore,
@@ -572,16 +485,12 @@ class _ProductListScreenState
                               ),
                             ),
                           ),
-
                         if (canHardDelete)
                           const PopupMenuItem(
-                            value:
-                                'hardDelete',
-
+                            value: 'hardDelete',
                             child: ListTile(
                               leading: Icon(
-                                Icons
-                                    .delete_forever,
+                                Icons.delete_forever,
                               ),
                               title: Text(
                                 'Удалить навсегда',
@@ -598,12 +507,9 @@ class _ProductListScreenState
 
       // Массовое удаление используется
       // только manager/admin.
-      onDeleteSelected: canManage
-          ? notifier.deleteSelected
-          : () async {},
+      onDeleteSelected: canManage ? notifier.deleteSelected : () async {},
 
-      onRetry:
-          notifier.load,
+      onRetry: notifier.load,
 
       // Кнопка "+" скрыта у customer.
       onCreate: canManage
@@ -614,17 +520,13 @@ class _ProductListScreenState
             }
           : null,
 
-      page:
-          notifier.result.page,
+      page: notifier.result.page,
 
-      totalPages:
-          notifier.result.totalPages,
+      totalPages: notifier.result.totalPages,
 
-      total:
-          notifier.result.total,
+      total: notifier.result.total,
 
-      size:
-          notifier.result.size,
+      size: notifier.result.size,
 
       onPageChanged: (page) {
         _change(

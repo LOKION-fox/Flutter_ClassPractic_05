@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 
+Widget _dialogContent(
+  String message,
+) {
+  return ConstrainedBox(
+    constraints: const BoxConstraints(
+      maxWidth: 520,
+    ),
+    child: Text(message),
+  );
+}
+
 Future<bool> confirmDialog(
   BuildContext context, {
   required String title,
@@ -9,8 +20,18 @@ Future<bool> confirmDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(title),
-            content: Text(message),
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 24,
+            ),
+            title: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            content: _dialogContent(
+              message,
+            ),
             actions: [
               TextButton(
                 onPressed: () {
@@ -19,8 +40,9 @@ Future<bool> confirmDialog(
                     false,
                   );
                 },
-                child:
-                    const Text('Отмена'),
+                child: const Text(
+                  'Отмена',
+                ),
               ),
               FilledButton(
                 onPressed: () {
@@ -29,7 +51,9 @@ Future<bool> confirmDialog(
                     true,
                   );
                 },
-                child: const Text('Да'),
+                child: const Text(
+                  'Да',
+                ),
               ),
             ],
           );
@@ -47,12 +71,24 @@ Future<void> messageDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text(title),
-        content: Text(message),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 24,
+        ),
+        title: Text(
+          title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        content: _dialogContent(
+          message,
+        ),
         actions: [
           FilledButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(
+                context,
+              );
             },
             child: const Text('ОК'),
           ),

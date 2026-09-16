@@ -28,8 +28,7 @@ class ProductQuery {
     this.includeDeleted = false,
   });
 
-  static const _unset =
-      Object();
+  static const _unset = Object();
 
   ProductQuery copyWith({
     String? search,
@@ -44,75 +43,37 @@ class ProductQuery {
     bool? includeDeleted,
   }) {
     return ProductQuery(
-      search:
-          search ?? this.search,
-
-      categoryId:
-          categoryId == _unset
-              ? this.categoryId
-              : categoryId as int?,
-
-      supplierId:
-          supplierId == _unset
-              ? this.supplierId
-              : supplierId as int?,
-
-      priceFrom:
-          priceFrom == _unset
-              ? this.priceFrom
-              : priceFrom as double?,
-
-      priceTo:
-          priceTo == _unset
-              ? this.priceTo
-              : priceTo as double?,
-
-      sortField:
-          sortField ??
-              this.sortField,
-
-      sortAscending:
-          sortAscending ??
-              this.sortAscending,
-
-      page:
-          page ?? 1,
-
-      size:
-          size ?? this.size,
-
-      includeDeleted:
-          includeDeleted ??
-              this.includeDeleted,
+      search: search ?? this.search,
+      categoryId: categoryId == _unset ? this.categoryId : categoryId as int?,
+      supplierId: supplierId == _unset ? this.supplierId : supplierId as int?,
+      priceFrom: priceFrom == _unset ? this.priceFrom : priceFrom as double?,
+      priceTo: priceTo == _unset ? this.priceTo : priceTo as double?,
+      sortField: sortField ?? this.sortField,
+      sortAscending: sortAscending ?? this.sortAscending,
+      page: page ?? 1,
+      size: size ?? this.size,
+      includeDeleted: includeDeleted ?? this.includeDeleted,
     );
   }
 
   factory ProductQuery.fromUri(
     Uri uri,
   ) {
-    final query =
-        uri.queryParameters;
+    final query = uri.queryParameters;
 
-    final sort =
-        (query['sort'] ??
-                'name,asc')
-            .split(',');
+    final sort = (query['sort'] ?? 'name,asc').split(',');
 
-    var sortField =
-        sort.first;
+    var sortField = sort.first;
 
-    if (
-      !{
-        'name',
-        'price',
-        'stock',
-      }.contains(sortField)
-    ) {
+    if (!{
+      'name',
+      'price',
+      'stock',
+    }.contains(sortField)) {
       sortField = 'name';
     }
 
-    var page =
-        int.tryParse(
+    var page = int.tryParse(
           query['page'] ?? '',
         ) ??
         1;
@@ -121,110 +82,70 @@ class ProductQuery {
       page = 1;
     }
 
-    var size =
-        int.tryParse(
+    var size = int.tryParse(
           query['size'] ?? '',
         ) ??
         10;
 
-    if (
-      ![
-        10,
-        25,
-        50,
-      ].contains(size)
-    ) {
+    if (![
+      10,
+      25,
+      50,
+    ].contains(size)) {
       size = 10;
     }
 
     return ProductQuery(
-      search:
-          query['search'] ?? '',
-
-      categoryId:
-          int.tryParse(
-        query['categoryId'] ??
-            '',
+      search: query['search'] ?? '',
+      categoryId: int.tryParse(
+        query['categoryId'] ?? '',
       ),
-
-      supplierId:
-          int.tryParse(
-        query['supplierId'] ??
-            '',
+      supplierId: int.tryParse(
+        query['supplierId'] ?? '',
       ),
-
-      priceFrom:
-          double.tryParse(
-        query['priceFrom'] ??
-            '',
+      priceFrom: double.tryParse(
+        query['priceFrom'] ?? '',
       ),
-
-      priceTo:
-          double.tryParse(
-        query['priceTo'] ??
-            '',
+      priceTo: double.tryParse(
+        query['priceTo'] ?? '',
       ),
-
-      sortField:
-          sortField,
-
-      sortAscending:
-          sort.length < 2 ||
-              sort[1] != 'desc',
-
+      sortField: sortField,
+      sortAscending: sort.length < 2 || sort[1] != 'desc',
       page: page,
       size: size,
-
-      includeDeleted:
-          query['deleted'] ==
-              '1',
+      includeDeleted: query['deleted'] == '1',
     );
   }
 
-  Map<String, dynamic>
-      toApiQueryParameters() {
-    final result =
-        <String, dynamic>{
-      'sort':
-          '$sortField,${sortAscending ? 'asc' : 'desc'}',
-
-      'page':
-          page,
-
-      'size':
-          size,
+  Map<String, dynamic> toApiQueryParameters() {
+    final result = <String, dynamic>{
+      'sort': '$sortField,${sortAscending ? 'asc' : 'desc'}',
+      'page': page,
+      'size': size,
     };
 
-    if (
-      search.trim().isNotEmpty
-    ) {
-      result['search'] =
-          search.trim();
+    if (search.trim().isNotEmpty) {
+      result['search'] = search.trim();
     }
 
     if (categoryId != null) {
-      result['categoryId'] =
-          categoryId;
+      result['categoryId'] = categoryId;
     }
 
     if (supplierId != null) {
-      result['supplierId'] =
-          supplierId;
+      result['supplierId'] = supplierId;
     }
 
     if (priceFrom != null) {
-      result['priceFrom'] =
-          priceFrom;
+      result['priceFrom'] = priceFrom;
     }
 
     if (priceTo != null) {
-      result['priceTo'] =
-          priceTo;
+      result['priceTo'] = priceTo;
     }
 
     if (includeDeleted) {
-      result['includeDeleted'] =
-          'true';
+      result['includeDeleted'] = 'true';
     }
 
     return result;
@@ -233,54 +154,41 @@ class ProductQuery {
   String toLocation(
     String path,
   ) {
-    final params =
-        <String, String>{};
+    final params = <String, String>{};
 
-    if (
-      search.trim().isNotEmpty
-    ) {
-      params['search'] =
-          search.trim();
+    if (search.trim().isNotEmpty) {
+      params['search'] = search.trim();
     }
 
     if (categoryId != null) {
-      params['categoryId'] =
-          categoryId.toString();
+      params['categoryId'] = categoryId.toString();
     }
 
     if (supplierId != null) {
-      params['supplierId'] =
-          supplierId.toString();
+      params['supplierId'] = supplierId.toString();
     }
 
     if (priceFrom != null) {
-      params['priceFrom'] =
-          priceFrom.toString();
+      params['priceFrom'] = priceFrom.toString();
     }
 
     if (priceTo != null) {
-      params['priceTo'] =
-          priceTo.toString();
+      params['priceTo'] = priceTo.toString();
     }
 
-    params['sort'] =
-        '$sortField,${sortAscending ? 'asc' : 'desc'}';
+    params['sort'] = '$sortField,${sortAscending ? 'asc' : 'desc'}';
 
-    params['page'] =
-        page.toString();
+    params['page'] = page.toString();
 
-    params['size'] =
-        size.toString();
+    params['size'] = size.toString();
 
     if (includeDeleted) {
-      params['deleted'] =
-          '1';
+      params['deleted'] = '1';
     }
 
     return Uri(
       path: path,
-      queryParameters:
-          params,
+      queryParameters: params,
     ).toString();
   }
 
@@ -288,31 +196,21 @@ class ProductQuery {
   bool operator ==(
     Object other,
   ) {
-    return other
-            is ProductQuery &&
-        other.search ==
-            search &&
-        other.categoryId ==
-            categoryId &&
-        other.supplierId ==
-            supplierId &&
-        other.priceFrom ==
-            priceFrom &&
-        other.priceTo ==
-            priceTo &&
-        other.sortField ==
-            sortField &&
-        other.sortAscending ==
-            sortAscending &&
+    return other is ProductQuery &&
+        other.search == search &&
+        other.categoryId == categoryId &&
+        other.supplierId == supplierId &&
+        other.priceFrom == priceFrom &&
+        other.priceTo == priceTo &&
+        other.sortField == sortField &&
+        other.sortAscending == sortAscending &&
         other.page == page &&
         other.size == size &&
-        other.includeDeleted ==
-            includeDeleted;
+        other.includeDeleted == includeDeleted;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(
+  int get hashCode => Object.hash(
         search,
         categoryId,
         supplierId,

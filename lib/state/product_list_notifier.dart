@@ -7,22 +7,18 @@ import '../models/product_query.dart';
 import '../repositories/product_repository.dart';
 import 'load_status.dart';
 
-class ProductListNotifier
-    extends ChangeNotifier {
+class ProductListNotifier extends ChangeNotifier {
   final ProductRepository _repository;
 
   ProductListNotifier(
     this._repository,
   );
 
-  ProductQuery _query =
-      const ProductQuery();
+  ProductQuery _query = const ProductQuery();
 
-  PageResult<Product> _result =
-      PageResult<Product>.empty();
+  PageResult<Product> _result = PageResult<Product>.empty();
 
-  LoadStatus _status =
-      LoadStatus.idle;
+  LoadStatus _status = LoadStatus.idle;
 
   String? _error;
 
@@ -30,15 +26,13 @@ class ProductListNotifier
 
   ProductQuery get query => _query;
 
-  PageResult<Product> get result =>
-      _result;
+  PageResult<Product> get result => _result;
 
   LoadStatus get status => _status;
 
   String? get error => _error;
 
-  Set<int> get selected =>
-      Set.unmodifiable(_selected);
+  Set<int> get selected => Set.unmodifiable(_selected);
 
   Future<void> load() async {
     _status = LoadStatus.loading;
@@ -47,8 +41,7 @@ class ProductListNotifier
     notifyListeners();
 
     try {
-      _result =
-          await _repository.find(
+      _result = await _repository.find(
         _query,
       );
 
@@ -59,8 +52,7 @@ class ProductListNotifier
       _error = e.message;
       _status = LoadStatus.error;
     } catch (e) {
-      _error =
-          'Неизвестная ошибка: $e';
+      _error = 'Неизвестная ошибка: $e';
 
       _status = LoadStatus.error;
     }
@@ -100,8 +92,7 @@ class ProductListNotifier
   Future<Product> create(
     Product product,
   ) async {
-    final created =
-        await _repository.create(
+    final created = await _repository.create(
       product,
     );
 

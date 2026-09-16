@@ -4,8 +4,7 @@ import '../models/app_role.dart';
 import '../models/app_user.dart';
 import 'user_admin_repository.dart';
 
-class ApiUserAdminRepository
-    implements UserAdminRepository {
+class ApiUserAdminRepository implements UserAdminRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -15,25 +14,20 @@ class ApiUserAdminRepository
   );
 
   @override
-  Future<List<AppUser>>
-      findUsers() {
+  Future<List<AppUser>> findUsers() {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.get(
+        final response = await _api.get(
           '/admin/users',
         );
 
-        final source =
-            response.data as List;
+        final source = response.data as List;
 
         return source
             .whereType<Map>()
             .map(
-              (item) =>
-                  AppUser.fromJson(
-                Map<String, dynamic>
-                    .from(item),
+              (item) => AppUser.fromJson(
+                Map<String, dynamic>.from(item),
               ),
             )
             .toList();
@@ -48,10 +42,8 @@ class ApiUserAdminRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.put(
+        final response = await _api.put(
           '/admin/users/$userId/role',
-
           data: {
             'role': role.value,
           },
@@ -67,17 +59,14 @@ class ApiUserAdminRepository
   }
 
   @override
-  Future<Map<String, int>>
-      getStatistics() {
+  Future<Map<String, int>> getStatistics() {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.get(
+        final response = await _api.get(
           '/admin/stats',
         );
 
-        final source =
-            Map<String, dynamic>.from(
+        final source = Map<String, dynamic>.from(
           response.data as Map,
         );
 
@@ -88,8 +77,7 @@ class ApiUserAdminRepository
           ) {
             return MapEntry(
               key,
-              (value as num)
-                  .toInt(),
+              (value as num).toInt(),
             );
           },
         );

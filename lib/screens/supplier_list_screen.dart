@@ -5,15 +5,16 @@ import 'package:provider/provider.dart';
 import '../models/app_role.dart';
 import '../models/simple_query.dart';
 import '../models/supplier.dart';
+
 import '../state/auth_notifier.dart';
 import '../state/supplier_list_notifier.dart';
+
 import '../widgets/dialogs.dart';
 import '../widgets/entity_list_scaffold.dart';
 import '../widgets/entity_table.dart';
 import '../widgets/simple_filters.dart';
 
-class SupplierListScreen
-    extends StatefulWidget {
+class SupplierListScreen extends StatefulWidget {
   final SimpleQuery initialQuery;
 
   const SupplierListScreen({
@@ -22,28 +23,26 @@ class SupplierListScreen
   });
 
   @override
-  State<SupplierListScreen>
-      createState() =>
-          _SupplierListScreenState();
+  State<SupplierListScreen> createState() => _SupplierListScreenState();
 }
 
-class _SupplierListScreenState
-    extends State<SupplierListScreen> {
+class _SupplierListScreenState extends State<SupplierListScreen> {
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      context
-          .read<SupplierListNotifier>()
-          .applyQuery(
-            widget.initialQuery,
-          );
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        context.read<SupplierListNotifier>().applyQuery(
+              widget.initialQuery,
+            );
+      },
+    );
   }
 
-  void _change(SimpleQuery query) {
+  void _change(
+    SimpleQuery query,
+  ) {
     context.go(
       query.toLocation(
         '/suppliers',
@@ -69,9 +68,7 @@ class _SupplierListScreenState
     }
 
     try {
-      final notifier =
-          context.read<
-              SupplierListNotifier>();
+      final notifier = context.read<SupplierListNotifier>();
 
       if (hard) {
         await notifier.hardDelete(
@@ -89,8 +86,7 @@ class _SupplierListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Удаление невозможно',
+        title: 'Удаление невозможно',
         message: e.toString(),
       );
     }
@@ -100,9 +96,7 @@ class _SupplierListScreenState
     Supplier supplier,
   ) async {
     try {
-      await context
-          .read<SupplierListNotifier>()
-          .restore(
+      await context.read<SupplierListNotifier>().restore(
             supplier.id,
           );
     } catch (e) {
@@ -112,25 +106,21 @@ class _SupplierListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Восстановление невозможно',
+        title: 'Восстановление невозможно',
         message: e.toString(),
       );
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final notifier =
-        context.watch<
-            SupplierListNotifier>();
+  Widget build(
+    BuildContext context,
+  ) {
+    final notifier = context.watch<SupplierListNotifier>();
 
-    final auth =
-        context.watch<
-            AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final query =
-        widget.initialQuery;
+    final query = widget.initialQuery;
 
     final canHardDelete = auth.can(
       AppPermission.hardDelete,
@@ -142,11 +132,9 @@ class _SupplierListScreenState
 
     return EntityListScaffold<Supplier>(
       title: 'Поставщики',
-
       filters: SimpleFilters(
         query: query,
-        searchLabel:
-            'Название, страна или email',
+        searchLabel: 'Название, страна или email',
         filterLabel: 'Страна',
         filterOptions: const {
           'Россия': 'Россия',
@@ -157,35 +145,23 @@ class _SupplierListScreenState
         },
         onChanged: _change,
       ),
-
       status: notifier.status,
       error: notifier.error,
       items: notifier.result.items,
       selected: notifier.selected,
-
       table: EntityTable<Supplier>(
-        items:
-            notifier.result.items,
-        idOf: (s) => s.id,
-        selected:
-            notifier.selected,
-        onToggleSelect:
-            notifier.toggleSelection,
-        sortField:
-            query.sortField,
-        sortAscending:
-            query.sortAscending,
+        items: notifier.result.items,
+        idOf: (supplier) => supplier.id,
+        selected: notifier.selected,
+        onToggleSelect: notifier.toggleSelection,
+        sortField: query.sortField,
+        sortAscending: query.sortAscending,
         onSort: (field) {
           _change(
             query.copyWith(
               sortField: field,
               sortAscending:
-                  field ==
-                          query
-                              .sortField
-                      ? !query
-                          .sortAscending
-                      : true,
+                  field == query.sortField ? !query.sortAscending : true,
             ),
           );
         },
@@ -193,118 +169,149 @@ class _SupplierListScreenState
           TableColumnSpec(
             label: 'Название',
             sortField: 'name',
-            build: (s) =>
-                Text(s.name),
+            build: (supplier) {
+              return Text(
+                supplier.name,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'Страна',
             sortField: 'country',
-            build: (s) =>
-                Text(s.country),
+            build: (supplier) {
+              return Text(
+                supplier.country,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'Email',
-            build: (s) =>
-                Text(s.email),
+            build: (supplier) {
+              return Text(
+                supplier.email,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'ID',
             sortField: 'id',
             numeric: true,
-            build: (s) =>
-                Text('${s.id}'),
-          ),
-        ],
-        actions: (s) => [
-          IconButton(
-            icon: const Icon(
-              Icons.visibility,
-            ),
-            onPressed: () {
-              context.push(
-                '/suppliers/${s.id}',
+            build: (supplier) {
+              return Text(
+                '${supplier.id}',
               );
             },
           ),
-          if (!s.isDeleted)
+        ],
+        actions: (supplier) {
+          return [
             IconButton(
+              tooltip: 'Просмотр',
               icon: const Icon(
-                Icons.edit,
+                Icons.visibility,
               ),
               onPressed: () {
                 context.push(
-                  '/suppliers/${s.id}/edit',
+                  '/suppliers/'
+                  '${supplier.id}',
                 );
               },
             ),
-          if (!s.isDeleted)
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline,
+            if (!supplier.isDeleted)
+              IconButton(
+                tooltip: 'Редактировать',
+                icon: const Icon(
+                  Icons.edit,
+                ),
+                onPressed: () {
+                  context.push(
+                    '/suppliers/'
+                    '${supplier.id}/edit',
+                  );
+                },
               ),
-              onPressed: () {
-                _delete(s, false);
-              },
-            ),
-          if (canRestore &&
-              s.isDeleted)
-            IconButton(
-              icon: const Icon(
-                Icons.restore,
+            if (!supplier.isDeleted)
+              IconButton(
+                tooltip: 'Логически удалить',
+                icon: const Icon(
+                  Icons.delete_outline,
+                ),
+                onPressed: () {
+                  _delete(
+                    supplier,
+                    false,
+                  );
+                },
               ),
-              onPressed: () {
-                _restore(s);
-              },
-            ),
-          if (canHardDelete)
-            IconButton(
-              icon: const Icon(
-                Icons.delete_forever,
+            if (canRestore && supplier.isDeleted)
+              IconButton(
+                tooltip: 'Восстановить',
+                icon: const Icon(
+                  Icons.restore,
+                ),
+                onPressed: () {
+                  _restore(
+                    supplier,
+                  );
+                },
               ),
-              onPressed: () {
-                _delete(s, true);
-              },
-            ),
-        ],
+            if (canHardDelete)
+              IconButton(
+                tooltip: 'Удалить навсегда',
+                icon: const Icon(
+                  Icons.delete_forever,
+                ),
+                onPressed: () {
+                  _delete(
+                    supplier,
+                    true,
+                  );
+                },
+              ),
+          ];
+        },
       ),
-
-      cardBuilder: (s) => Card(
-        child: ListTile(
-          title: Text(s.name),
-          subtitle: Text(
-            '${s.country}\n${s.email}',
+      cardBuilder: (supplier) {
+        return Card(
+          child: ListTile(
+            title: Text(
+              supplier.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              '${supplier.country}\n'
+              '${supplier.email}',
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              context.push(
+                '/suppliers/'
+                '${supplier.id}',
+              );
+            },
           ),
-          onTap: () {
-            context.push(
-              '/suppliers/${s.id}',
-            );
-          },
-        ),
-      ),
-
-      onDeleteSelected:
-          notifier.deleteSelected,
-
+        );
+      },
+      onDeleteSelected: notifier.deleteSelected,
       onRetry: notifier.load,
-
       onCreate: () {
         context.push(
           '/suppliers/new',
         );
       },
-
       page: notifier.result.page,
-      totalPages:
-          notifier.result.totalPages,
+      totalPages: notifier.result.totalPages,
       total: notifier.result.total,
       size: notifier.result.size,
-
       onPageChanged: (page) {
         _change(
-          query.copyWith(page: page),
+          query.copyWith(
+            page: page,
+          ),
         );
       },
-
       onSizeChanged: (size) {
         _change(
           query.copyWith(

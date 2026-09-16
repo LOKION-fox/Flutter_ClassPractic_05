@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import '../models/animal_query.dart';
 import '../models/supplier.dart';
 
-class AnimalFilters
-    extends StatefulWidget {
+class AnimalFilters extends StatefulWidget {
   final AnimalQuery query;
 
   final List<Supplier> suppliers;
 
-  final ValueChanged<AnimalQuery>
-      onChanged;
+  final ValueChanged<AnimalQuery> onChanged;
 
   final bool showDeletedToggle;
 
@@ -25,15 +23,11 @@ class AnimalFilters
   });
 
   @override
-  State<AnimalFilters>
-      createState() =>
-          _AnimalFiltersState();
+  State<AnimalFilters> createState() => _AnimalFiltersState();
 }
 
-class _AnimalFiltersState
-    extends State<AnimalFilters> {
-  late final TextEditingController
-      _search;
+class _AnimalFiltersState extends State<AnimalFilters> {
+  late final TextEditingController _search;
 
   Timer? _timer;
 
@@ -41,8 +35,7 @@ class _AnimalFiltersState
   void initState() {
     super.initState();
 
-    _search =
-        TextEditingController(
+    _search = TextEditingController(
       text: widget.query.search,
     );
   }
@@ -78,84 +71,59 @@ class _AnimalFiltersState
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding:
-            const EdgeInsets.all(16),
-
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: _search,
-
-              onChanged:
-                  _searchChanged,
-
-              decoration:
-                  const InputDecoration(
-                labelText:
-                    'Поиск по имени, породе или стране',
-                prefixIcon:
-                    Icon(Icons.search),
-                border:
-                    OutlineInputBorder(),
+              onChanged: _searchChanged,
+              decoration: const InputDecoration(
+                labelText: 'Поиск по имени, породе или стране',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
               ),
             ),
-
             const SizedBox(height: 14),
-
             Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
                 SizedBox(
                   width: 190,
-                  child:
-                      DropdownButtonFormField<
-                          String>(
-                    initialValue:
-                        widget
-                            .query
-                            .species,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: widget.query.species,
                     isExpanded: true,
-                    decoration:
-                        const InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Вид',
-                      border:
-                          OutlineInputBorder(),
+                      border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: null,
-                        child:
-                            Text('Все'),
+                        child: Text('Все'),
                       ),
                       DropdownMenuItem(
                         value: 'Кошка',
-                        child:
-                            Text('Кошка'),
+                        child: Text('Кошка'),
                       ),
                       DropdownMenuItem(
                         value: 'Собака',
-                        child:
-                            Text('Собака'),
+                        child: Text('Собака'),
                       ),
                       DropdownMenuItem(
                         value: 'Хомяк',
-                        child:
-                            Text('Хомяк'),
+                        child: Text('Хомяк'),
                       ),
                       DropdownMenuItem(
                         value: 'Попугай',
-                        child:
-                            Text('Попугай'),
+                        child: Text('Попугай'),
                       ),
                       DropdownMenuItem(
                         value: 'Кролик',
-                        child:
-                            Text('Кролик'),
+                        child: Text('Кролик'),
                       ),
                       DropdownMenuItem(
-                        value:
-                            'Морская свинка',
+                        value: 'Морская свинка',
                         child: Text(
                           'Морская свинка',
                         ),
@@ -163,118 +131,84 @@ class _AnimalFiltersState
                     ],
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
+                        widget.query.copyWith(
                           species: value,
                         ),
                       );
                     },
                   ),
                 ),
-
                 SizedBox(
                   width: 170,
-                  child:
-                      DropdownButtonFormField<
-                          String>(
-                    initialValue:
-                        widget.query.sex,
-                    decoration:
-                        const InputDecoration(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: widget.query.sex,
+                    decoration: const InputDecoration(
                       labelText: 'Пол',
-                      border:
-                          OutlineInputBorder(),
+                      border: OutlineInputBorder(),
                     ),
                     items: const [
                       DropdownMenuItem(
                         value: null,
-                        child:
-                            Text('Любой'),
+                        child: Text('Любой'),
                       ),
                       DropdownMenuItem(
                         value: 'Самец',
-                        child:
-                            Text('Самец'),
+                        child: Text('Самец'),
                       ),
                       DropdownMenuItem(
                         value: 'Самка',
-                        child:
-                            Text('Самка'),
+                        child: Text('Самка'),
                       ),
                     ],
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
+                        widget.query.copyWith(
                           sex: value,
                         ),
                       );
                     },
                   ),
                 ),
-
                 SizedBox(
                   width: 240,
-                  child:
-                      DropdownButtonFormField<
-                          int>(
-                    initialValue:
-                        widget
-                            .query
-                            .supplierId,
+                  child: DropdownButtonFormField<int>(
+                    initialValue: widget.query.supplierId,
                     isExpanded: true,
-                    decoration:
-                        const InputDecoration(
-                      labelText:
-                          'Поставщик',
-                      border:
-                          OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Поставщик',
+                      border: OutlineInputBorder(),
                     ),
                     items: [
-                      const DropdownMenuItem<
-                          int>(
+                      const DropdownMenuItem<int>(
                         value: null,
-                        child:
-                            Text('Все'),
+                        child: Text('Все'),
                       ),
-                      ...widget.suppliers
-                          .map(
-                        (s) =>
-                            DropdownMenuItem(
+                      ...widget.suppliers.map(
+                        (s) => DropdownMenuItem(
                           value: s.id,
-                          child:
-                              Text(s.name),
+                          child: Text(s.name),
                         ),
                       ),
                     ],
                     onChanged: (value) {
                       widget.onChanged(
-                        widget.query
-                            .copyWith(
-                          supplierId:
-                              value,
+                        widget.query.copyWith(
+                          supplierId: value,
                         ),
                       );
                     },
                   ),
                 ),
-
-                if (widget
-                    .showDeletedToggle)
+                if (widget.showDeletedToggle)
                   Row(
-                    mainAxisSize:
-                        MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Switch(
-                        value: widget
-                            .query
-                            .includeDeleted,
+                        value: widget.query.includeDeleted,
                         onChanged: (value) {
                           widget.onChanged(
-                            widget.query
-                                .copyWith(
-                              includeDeleted:
-                                  value,
+                            widget.query.copyWith(
+                              includeDeleted: value,
                             ),
                           );
                         },

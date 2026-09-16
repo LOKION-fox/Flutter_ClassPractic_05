@@ -22,8 +22,7 @@ class SimpleQuery {
     this.includeDeleted = false,
   });
 
-  static const _unset =
-      Object();
+  static const _unset = Object();
 
   SimpleQuery copyWith({
     String? search,
@@ -35,67 +34,35 @@ class SimpleQuery {
     bool? includeDeleted,
   }) {
     return SimpleQuery(
-      search:
-          search ?? this.search,
-
-      filter:
-          filter == _unset
-              ? this.filter
-              : filter as String?,
-
-      sortField:
-          sortField ??
-              this.sortField,
-
-      sortAscending:
-          sortAscending ??
-              this.sortAscending,
-
-      page:
-          page ?? 1,
-
-      size:
-          size ?? this.size,
-
-      includeDeleted:
-          includeDeleted ??
-              this.includeDeleted,
+      search: search ?? this.search,
+      filter: filter == _unset ? this.filter : filter as String?,
+      sortField: sortField ?? this.sortField,
+      sortAscending: sortAscending ?? this.sortAscending,
+      page: page ?? 1,
+      size: size ?? this.size,
+      includeDeleted: includeDeleted ?? this.includeDeleted,
     );
   }
 
   factory SimpleQuery.fromUri(
     Uri uri, {
-    required String
-        filterParam,
-
-    required Set<String>
-        allowedSortFields,
-
+    required String filterParam,
+    required Set<String> allowedSortFields,
     String defaultSort = 'name',
   }) {
-    final query =
-        uri.queryParameters;
+    final query = uri.queryParameters;
 
-    final sort =
-        (query['sort'] ??
-                '$defaultSort,asc')
-            .split(',');
+    final sort = (query['sort'] ?? '$defaultSort,asc').split(',');
 
-    var sortField =
-        sort.first;
+    var sortField = sort.first;
 
-    if (
-      !allowedSortFields
-          .contains(
-        sortField,
-      )
-    ) {
-      sortField =
-          defaultSort;
+    if (!allowedSortFields.contains(
+      sortField,
+    )) {
+      sortField = defaultSort;
     }
 
-    var page =
-        int.tryParse(
+    var page = int.tryParse(
           query['page'] ?? '',
         ) ??
         1;
@@ -104,76 +71,49 @@ class SimpleQuery {
       page = 1;
     }
 
-    var size =
-        int.tryParse(
+    var size = int.tryParse(
           query['size'] ?? '',
         ) ??
         10;
 
-    if (
-      ![
-        10,
-        25,
-        50,
-      ].contains(size)
-    ) {
+    if (![
+      10,
+      25,
+      50,
+    ].contains(size)) {
       size = 10;
     }
 
     return SimpleQuery(
-      search:
-          query['search'] ?? '',
-
-      filter:
-          query[filterParam],
-
-      sortField:
-          sortField,
-
-      sortAscending:
-          sort.length < 2 ||
-              sort[1] != 'desc',
-
+      search: query['search'] ?? '',
+      filter: query[filterParam],
+      sortField: sortField,
+      sortAscending: sort.length < 2 || sort[1] != 'desc',
       page: page,
       size: size,
-
-      includeDeleted:
-          query['deleted'] ==
-              '1',
+      includeDeleted: query['deleted'] == '1',
     );
   }
 
-  Map<String, dynamic>
-      toApiQueryParameters({
+  Map<String, dynamic> toApiQueryParameters({
     required String filterParam,
   }) {
-    final result =
-        <String, dynamic>{
-      'sort':
-          '$sortField,${sortAscending ? 'asc' : 'desc'}',
-
-      'page':
-          page,
-
-      'size':
-          size,
+    final result = <String, dynamic>{
+      'sort': '$sortField,${sortAscending ? 'asc' : 'desc'}',
+      'page': page,
+      'size': size,
     };
 
-    if (
-      search.trim().isNotEmpty
-    ) {
-      result['search'] =
-          search.trim();
+    if (search.trim().isNotEmpty) {
+      result['search'] = search.trim();
     }
 
     if (filter != null) {
-      result[filterParam] =
-          filter;
+      result[filterParam] = filter;
     }
 
     if (includeDeleted) {
-      result['includeDeleted'] =
-          'true';
+      result['includeDeleted'] = 'true';
     }
 
     return result;
@@ -181,42 +121,31 @@ class SimpleQuery {
 
   String toLocation(
     String path, {
-    required String
-        filterParam,
+    required String filterParam,
   }) {
-    final params =
-        <String, String>{};
+    final params = <String, String>{};
 
-    if (
-      search.trim().isNotEmpty
-    ) {
-      params['search'] =
-          search.trim();
+    if (search.trim().isNotEmpty) {
+      params['search'] = search.trim();
     }
 
     if (filter != null) {
-      params[filterParam] =
-          filter!;
+      params[filterParam] = filter!;
     }
 
-    params['sort'] =
-        '$sortField,${sortAscending ? 'asc' : 'desc'}';
+    params['sort'] = '$sortField,${sortAscending ? 'asc' : 'desc'}';
 
-    params['page'] =
-        page.toString();
+    params['page'] = page.toString();
 
-    params['size'] =
-        size.toString();
+    params['size'] = size.toString();
 
     if (includeDeleted) {
-      params['deleted'] =
-          '1';
+      params['deleted'] = '1';
     }
 
     return Uri(
       path: path,
-      queryParameters:
-          params,
+      queryParameters: params,
     ).toString();
   }
 
@@ -224,25 +153,18 @@ class SimpleQuery {
   bool operator ==(
     Object other,
   ) {
-    return other
-            is SimpleQuery &&
-        other.search ==
-            search &&
-        other.filter ==
-            filter &&
-        other.sortField ==
-            sortField &&
-        other.sortAscending ==
-            sortAscending &&
+    return other is SimpleQuery &&
+        other.search == search &&
+        other.filter == filter &&
+        other.sortField == sortField &&
+        other.sortAscending == sortAscending &&
         other.page == page &&
         other.size == size &&
-        other.includeDeleted ==
-            includeDeleted;
+        other.includeDeleted == includeDeleted;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(
+  int get hashCode => Object.hash(
         search,
         filter,
         sortField,

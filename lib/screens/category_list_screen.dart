@@ -5,15 +5,16 @@ import 'package:provider/provider.dart';
 import '../models/app_role.dart';
 import '../models/category.dart';
 import '../models/simple_query.dart';
+
 import '../state/auth_notifier.dart';
 import '../state/category_list_notifier.dart';
+
 import '../widgets/dialogs.dart';
 import '../widgets/entity_list_scaffold.dart';
 import '../widgets/entity_table.dart';
 import '../widgets/simple_filters.dart';
 
-class CategoryListScreen
-    extends StatefulWidget {
+class CategoryListScreen extends StatefulWidget {
   final SimpleQuery initialQuery;
 
   const CategoryListScreen({
@@ -22,28 +23,26 @@ class CategoryListScreen
   });
 
   @override
-  State<CategoryListScreen>
-      createState() =>
-          _CategoryListScreenState();
+  State<CategoryListScreen> createState() => _CategoryListScreenState();
 }
 
-class _CategoryListScreenState
-    extends State<CategoryListScreen> {
+class _CategoryListScreenState extends State<CategoryListScreen> {
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      context
-          .read<CategoryListNotifier>()
-          .applyQuery(
-            widget.initialQuery,
-          );
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        context.read<CategoryListNotifier>().applyQuery(
+              widget.initialQuery,
+            );
+      },
+    );
   }
 
-  void _change(SimpleQuery query) {
+  void _change(
+    SimpleQuery query,
+  ) {
     context.go(
       query.toLocation(
         '/categories',
@@ -59,9 +58,8 @@ class _CategoryListScreenState
     final ok = await confirmDialog(
       context,
       title: 'Удаление',
-      message: hard
-          ? 'Удалить категорию навсегда?'
-          : 'Логически удалить категорию?',
+      message:
+          hard ? 'Удалить категорию навсегда?' : 'Логически удалить категорию?',
     );
 
     if (!ok || !mounted) {
@@ -69,9 +67,7 @@ class _CategoryListScreenState
     }
 
     try {
-      final notifier =
-          context.read<
-              CategoryListNotifier>();
+      final notifier = context.read<CategoryListNotifier>();
 
       if (hard) {
         await notifier.hardDelete(
@@ -89,8 +85,7 @@ class _CategoryListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Удаление невозможно',
+        title: 'Удаление невозможно',
         message: e.toString(),
       );
     }
@@ -100,9 +95,7 @@ class _CategoryListScreenState
     Category category,
   ) async {
     try {
-      await context
-          .read<CategoryListNotifier>()
-          .restore(
+      await context.read<CategoryListNotifier>().restore(
             category.id,
           );
     } catch (e) {
@@ -112,25 +105,21 @@ class _CategoryListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Восстановление невозможно',
+        title: 'Восстановление невозможно',
         message: e.toString(),
       );
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final notifier =
-        context.watch<
-            CategoryListNotifier>();
+  Widget build(
+    BuildContext context,
+  ) {
+    final notifier = context.watch<CategoryListNotifier>();
 
-    final auth =
-        context.watch<
-            AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final query =
-        widget.initialQuery;
+    final query = widget.initialQuery;
 
     final canHardDelete = auth.can(
       AppPermission.hardDelete,
@@ -140,26 +129,19 @@ class _CategoryListScreenState
       AppPermission.restore,
     );
 
-    final table =
-        EntityTable<Category>(
+    final table = EntityTable<Category>(
       items: notifier.result.items,
-      idOf: (c) => c.id,
+      idOf: (category) => category.id,
       selected: notifier.selected,
-      onToggleSelect:
-          notifier.toggleSelection,
+      onToggleSelect: notifier.toggleSelection,
       sortField: query.sortField,
-      sortAscending:
-          query.sortAscending,
+      sortAscending: query.sortAscending,
       onSort: (field) {
         _change(
           query.copyWith(
             sortField: field,
             sortAscending:
-                field ==
-                        query.sortField
-                    ? !query
-                        .sortAscending
-                    : true,
+                field == query.sortField ? !query.sortAscending : true,
           ),
         );
       },
@@ -167,85 +149,110 @@ class _CategoryListScreenState
         TableColumnSpec(
           label: 'Название',
           sortField: 'name',
-          build: (c) => Text(c.name),
+          build: (category) {
+            return Text(
+              category.name,
+            );
+          },
         ),
         TableColumnSpec(
           label: 'Тип',
           sortField: 'kind',
-          build: (c) => Text(c.kind),
+          build: (category) {
+            return Text(
+              category.kind,
+            );
+          },
         ),
         TableColumnSpec(
           label: 'ID',
           sortField: 'id',
           numeric: true,
-          build: (c) =>
-              Text('${c.id}'),
-        ),
-      ],
-      actions: (c) => [
-        IconButton(
-          icon: const Icon(
-            Icons.visibility,
-          ),
-          onPressed: () {
-            context.push(
-              '/categories/${c.id}',
+          build: (category) {
+            return Text(
+              '${category.id}',
             );
           },
         ),
-        if (!c.isDeleted)
+      ],
+      actions: (category) {
+        return [
           IconButton(
-            icon:
-                const Icon(Icons.edit),
+            tooltip: 'Просмотр',
+            icon: const Icon(
+              Icons.visibility,
+            ),
             onPressed: () {
               context.push(
-                '/categories/${c.id}/edit',
+                '/categories/'
+                '${category.id}',
               );
             },
           ),
-        if (!c.isDeleted)
-          IconButton(
-            icon: const Icon(
-              Icons.delete_outline,
+          if (!category.isDeleted)
+            IconButton(
+              tooltip: 'Редактировать',
+              icon: const Icon(
+                Icons.edit,
+              ),
+              onPressed: () {
+                context.push(
+                  '/categories/'
+                  '${category.id}/edit',
+                );
+              },
             ),
-            onPressed: () {
-              _delete(c, false);
-            },
-          ),
-        if (canRestore &&
-            c.isDeleted)
-          IconButton(
-            icon: const Icon(
-              Icons.restore,
+          if (!category.isDeleted)
+            IconButton(
+              tooltip: 'Логически удалить',
+              icon: const Icon(
+                Icons.delete_outline,
+              ),
+              onPressed: () {
+                _delete(
+                  category,
+                  false,
+                );
+              },
             ),
-            onPressed: () {
-              _restore(c);
-            },
-          ),
-        if (canHardDelete)
-          IconButton(
-            icon: const Icon(
-              Icons.delete_forever,
+          if (canRestore && category.isDeleted)
+            IconButton(
+              tooltip: 'Восстановить',
+              icon: const Icon(
+                Icons.restore,
+              ),
+              onPressed: () {
+                _restore(
+                  category,
+                );
+              },
             ),
-            onPressed: () {
-              _delete(c, true);
-            },
-          ),
-      ],
+          if (canHardDelete)
+            IconButton(
+              tooltip: 'Удалить навсегда',
+              icon: const Icon(
+                Icons.delete_forever,
+              ),
+              onPressed: () {
+                _delete(
+                  category,
+                  true,
+                );
+              },
+            ),
+        ];
+      },
     );
 
     return EntityListScaffold<Category>(
       title: 'Категории',
       filters: SimpleFilters(
         query: query,
-        searchLabel:
-            'Поиск категории',
-        filterLabel:
-            'Тип категории',
+        searchLabel: 'Поиск категории',
+        filterLabel: 'Тип категории',
         filterOptions: const {
           'product': 'Для товаров',
-          'animal':
-              'Для животных',
+          'animal': 'Для животных',
           'both': 'Общие',
         },
         onChanged: _change,
@@ -255,22 +262,29 @@ class _CategoryListScreenState
       items: notifier.result.items,
       selected: notifier.selected,
       table: table,
-      cardBuilder: (c) {
+      cardBuilder: (category) {
         return Card(
           child: ListTile(
-            title: Text(c.name),
-            subtitle:
-                Text(c.description),
+            title: Text(
+              category.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              category.description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
             onTap: () {
               context.push(
-                '/categories/${c.id}',
+                '/categories/'
+                '${category.id}',
               );
             },
           ),
         );
       },
-      onDeleteSelected:
-          notifier.deleteSelected,
+      onDeleteSelected: notifier.deleteSelected,
       onRetry: notifier.load,
       onCreate: () {
         context.push(
@@ -278,13 +292,14 @@ class _CategoryListScreenState
         );
       },
       page: notifier.result.page,
-      totalPages:
-          notifier.result.totalPages,
+      totalPages: notifier.result.totalPages,
       total: notifier.result.total,
       size: notifier.result.size,
       onPageChanged: (page) {
         _change(
-          query.copyWith(page: page),
+          query.copyWith(
+            page: page,
+          ),
         );
       },
       onSizeChanged: (size) {

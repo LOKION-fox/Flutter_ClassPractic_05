@@ -23,8 +23,7 @@ void main() {
   setUp(() {
     dio = Dio(
       BaseOptions(
-        baseUrl:
-            'http://localhost:8080/api',
+        baseUrl: 'http://localhost:8080/api',
       ),
     );
 
@@ -36,12 +35,10 @@ void main() {
 
     // Для тестов считаем,
     // что пользователь уже вошёл.
-    session.accessToken =
-        'test-token';
+    session.accessToken = 'test-token';
 
     apiClient = ApiClient(
-      baseUrl:
-          'http://localhost:8080/api',
+      baseUrl: 'http://localhost:8080/api',
       session: session,
       dio: dio,
     );
@@ -51,8 +48,7 @@ void main() {
       session,
     );
 
-    repository =
-        ApiProductRepository(
+    repository = ApiProductRepository(
       apiClient,
       authService,
     );
@@ -84,8 +80,7 @@ void main() {
                     'name': 'Корм',
                   },
                 ],
-                'description':
-                    'Описание',
+                'description': 'Описание',
                 'deletedAt': null,
               },
             ],
@@ -97,8 +92,7 @@ void main() {
         ),
       );
 
-      final result =
-          await repository.find(
+      final result = await repository.find(
         const ProductQuery(),
       );
 
@@ -143,15 +137,13 @@ void main() {
                 'name': 'Игрушки',
               },
             ],
-            'description':
-                'Описание',
+            'description': 'Описание',
             'deletedAt': null,
           },
         ),
       );
 
-      final product =
-          await repository.findById(
+      final product = await repository.findById(
         1,
       );
 
@@ -208,8 +200,7 @@ void main() {
                 'name': 'Корм',
               },
             ],
-            'description':
-                'Описание',
+            'description': 'Описание',
             'deletedAt': null,
           },
         ),
@@ -219,8 +210,7 @@ void main() {
         data: product.toJson(),
       );
 
-      final created =
-          await repository.create(
+      final created = await repository.create(
         product,
       );
 
@@ -256,11 +246,9 @@ void main() {
         (server) => server.reply(
           422,
           {
-            'message':
-                'Ошибка валидации',
+            'message': 'Ошибка валидации',
             'errors': {
-              'article':
-                  'Товар с таким артикулом уже существует',
+              'article': 'Товар с таким артикулом уже существует',
             },
           },
         ),
@@ -295,11 +283,9 @@ void main() {
         (server) => server.reply(
           409,
           {
-            'message':
-                'Запись связана с другими данными',
+            'message': 'Запись связана с другими данными',
           },
         ),
-
         queryParameters: {
           'hard': 'true',
         },
@@ -339,8 +325,7 @@ void main() {
         },
       );
 
-      final count =
-          await repository.deleteMany(
+      final count = await repository.deleteMany(
         ids,
       );
 

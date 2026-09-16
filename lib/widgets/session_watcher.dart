@@ -6,8 +6,7 @@ import 'package:flutter/services.dart';
 import '../core/api_config.dart';
 import '../state/auth_notifier.dart';
 
-class SessionWatcher
-    extends StatefulWidget {
+class SessionWatcher extends StatefulWidget {
   final AuthNotifier auth;
   final Widget child;
 
@@ -18,13 +17,10 @@ class SessionWatcher
   });
 
   @override
-  State<SessionWatcher>
-      createState() =>
-          _SessionWatcherState();
+  State<SessionWatcher> createState() => _SessionWatcherState();
 }
 
-class _SessionWatcherState
-    extends State<SessionWatcher> {
+class _SessionWatcherState extends State<SessionWatcher> {
   Timer? _warningTimer;
   Timer? _logoutTimer;
   Timer? _absoluteTimer;
@@ -33,15 +29,13 @@ class _SessionWatcherState
   void initState() {
     super.initState();
 
-    HardwareKeyboard.instance
-        .addHandler(_onKey);
+    HardwareKeyboard.instance.addHandler(_onKey);
 
     widget.auth.addListener(
       _onAuthChanged,
     );
 
-    WidgetsBinding.instance
-        .addPostFrameCallback(
+    WidgetsBinding.instance.addPostFrameCallback(
       (_) => _syncTimers(),
     );
   }
@@ -59,23 +53,19 @@ class _SessionWatcherState
   }
 
   void _activity() {
-    if (!widget.auth
-        .isAuthenticated) {
+    if (!widget.auth.isAuthenticated) {
       return;
     }
 
     widget.auth.recordActivity();
 
-    ScaffoldMessenger
-        .maybeOf(context)
-        ?.hideCurrentSnackBar();
+    ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
 
     _scheduleInactivity();
   }
 
   void _syncTimers() {
-    if (!widget.auth
-        .isAuthenticated) {
+    if (!widget.auth.isAuthenticated) {
       _cancelTimers();
 
       return;
@@ -89,42 +79,28 @@ class _SessionWatcherState
     _warningTimer?.cancel();
     _logoutTimer?.cancel();
 
-    const timeout =
-        Duration(
-      seconds:
-          ApiConfig
-              .inactivitySeconds,
+    const timeout = Duration(
+      seconds: ApiConfig.inactivitySeconds,
     );
 
-    const warning =
-        Duration(
-      seconds:
-          ApiConfig
-              .warningSeconds,
+    const warning = Duration(
+      seconds: ApiConfig.warningSeconds,
     );
 
-    final last =
-        widget.auth
-                .lastActivityAt ??
-            DateTime.now();
+    final last = widget.auth.lastActivityAt ?? DateTime.now();
 
-    final elapsed =
-        DateTime.now()
-            .difference(last);
+    final elapsed = DateTime.now().difference(last);
 
-    var remaining =
-        timeout - elapsed;
+    var remaining = timeout - elapsed;
 
     if (remaining.isNegative) {
       remaining = Duration.zero;
     }
 
-    var warningDelay =
-        remaining - warning;
+    var warningDelay = remaining - warning;
 
     if (warningDelay.isNegative) {
-      warningDelay =
-          Duration.zero;
+      warningDelay = Duration.zero;
     }
 
     _warningTimer = Timer(
@@ -141,27 +117,20 @@ class _SessionWatcherState
   void _scheduleAbsolute() {
     _absoluteTimer?.cancel();
 
-    final started =
-        widget.auth
-            .sessionStartedAt;
+    final started = widget.auth.sessionStartedAt;
 
     if (started == null) {
       return;
     }
 
-    const maxDuration =
-        Duration(
-      seconds:
-          ApiConfig
-              .maxSessionSeconds,
+    const maxDuration = Duration(
+      seconds: ApiConfig.maxSessionSeconds,
     );
 
-    var remaining =
-        maxDuration -
-            DateTime.now()
-                .difference(
-              started,
-            );
+    var remaining = maxDuration -
+        DateTime.now().difference(
+          started,
+        );
 
     if (remaining.isNegative) {
       remaining = Duration.zero;
@@ -174,20 +143,14 @@ class _SessionWatcherState
   }
 
   void _showWarning() {
-    if (!mounted ||
-        !widget.auth
-            .isAuthenticated) {
+    if (!mounted || !widget.auth.isAuthenticated) {
       return;
     }
 
-    ScaffoldMessenger
-        .maybeOf(context)
-        ?.showSnackBar(
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       const SnackBar(
         duration: Duration(
-          seconds:
-              ApiConfig
-                  .warningSeconds,
+          seconds: ApiConfig.warningSeconds,
         ),
         content: Text(
           'Сессия завершится через 30 секунд '
@@ -197,15 +160,13 @@ class _SessionWatcherState
     );
   }
 
-  Future<void>
-      _logoutInactive() async {
+  Future<void> _logoutInactive() async {
     await widget.auth.forceLogout(
       'Сессия завершена после 3 минут бездействия.',
     );
   }
 
-  Future<void>
-      _logoutAbsolute() async {
+  Future<void> _logoutAbsolute() async {
     await widget.auth.forceLogout(
       'Завершено максимальное время сессии.',
     );
@@ -219,8 +180,7 @@ class _SessionWatcherState
 
   @override
   void dispose() {
-    HardwareKeyboard.instance
-        .removeHandler(_onKey);
+    HardwareKeyboard.instance.removeHandler(_onKey);
 
     widget.auth.removeListener(
       _onAuthChanged,
@@ -236,21 +196,16 @@ class _SessionWatcherState
     BuildContext context,
   ) {
     return Listener(
-      behavior:
-          HitTestBehavior.translucent,
-
+      behavior: HitTestBehavior.translucent,
       onPointerDown: (_) {
         _activity();
       },
-
       onPointerMove: (_) {
         _activity();
       },
-
       onPointerSignal: (_) {
         _activity();
       },
-
       child: widget.child,
     );
   }

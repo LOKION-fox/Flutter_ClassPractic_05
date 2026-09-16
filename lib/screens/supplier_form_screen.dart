@@ -11,8 +11,7 @@ import '../widgets/dialogs.dart';
 import '../widgets/entity_form_scaffold.dart';
 import '../widgets/multi_select_field.dart';
 
-class SupplierFormScreen
-    extends StatefulWidget {
+class SupplierFormScreen extends StatefulWidget {
   final int? id;
 
   const SupplierFormScreen({
@@ -20,28 +19,20 @@ class SupplierFormScreen
     this.id,
   });
 
-  bool get isEditing =>
-      id != null;
+  bool get isEditing => id != null;
 
   @override
-  State<SupplierFormScreen>
-      createState() =>
-          _SupplierFormScreenState();
+  State<SupplierFormScreen> createState() => _SupplierFormScreenState();
 }
 
-class _SupplierFormScreenState
-    extends State<SupplierFormScreen> {
-  final _formKey =
-      GlobalKey<FormState>();
+class _SupplierFormScreenState extends State<SupplierFormScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  final _name =
-      TextEditingController();
+  final _name = TextEditingController();
 
-  final _country =
-      TextEditingController();
+  final _country = TextEditingController();
 
-  final _email =
-      TextEditingController();
+  final _email = TextEditingController();
 
   List<Category> _categories = [];
 
@@ -53,8 +44,7 @@ class _SupplierFormScreenState
   bool _loading = true;
   bool _dirty = false;
 
-  Map<String, String>
-      _serverErrors = {};
+  Map<String, String> _serverErrors = {};
 
   @override
   void didChangeDependencies() {
@@ -69,18 +59,12 @@ class _SupplierFormScreenState
   Future<void> _load() async {
     try {
       final categories =
-          await context
-              .read<
-                  CategoryListNotifier>()
-              .getAllActive();
+          await context.read<CategoryListNotifier>().getAllActive();
 
       Supplier? supplier;
 
       if (widget.id != null) {
-        supplier = await context
-            .read<
-                SupplierListNotifier>()
-            .findById(
+        supplier = await context.read<SupplierListNotifier>().findById(
               widget.id!,
             );
       }
@@ -94,18 +78,14 @@ class _SupplierFormScreenState
         _original = supplier;
 
         if (supplier != null) {
-          _name.text =
-              supplier.name;
+          _name.text = supplier.name;
 
-          _country.text =
-              supplier.country;
+          _country.text = supplier.country;
 
-          _email.text =
-              supplier.email;
+          _email.text = supplier.email;
 
           _allowedIds = [
-            ...supplier
-                .allowedCategoryIds,
+            ...supplier.allowedCategoryIds,
           ];
         }
 
@@ -145,35 +125,23 @@ class _SupplierFormScreenState
       _serverErrors = {};
     });
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return false;
     }
 
     final supplier = Supplier(
       id: _original?.id ?? 0,
-
-      name:
-          _name.text.trim(),
-
-      country:
-          _country.text.trim(),
-
-      email:
-          _email.text.trim(),
-
+      name: _name.text.trim(),
+      country: _country.text.trim(),
+      email: _email.text.trim(),
       allowedCategoryIds: [
         ..._allowedIds,
       ],
-
-      deletedAt:
-          _original?.deletedAt,
+      deletedAt: _original?.deletedAt,
     );
 
     try {
-      final notifier =
-          context.read<
-              SupplierListNotifier>();
+      final notifier = context.read<SupplierListNotifier>();
 
       if (widget.isEditing) {
         await notifier.update(
@@ -194,20 +162,17 @@ class _SupplierFormScreenState
       }
 
       setState(() {
-        _serverErrors =
-            e.errors;
+        _serverErrors = e.errors;
       });
 
-      _formKey.currentState
-          ?.validate();
+      _formKey.currentState?.validate();
 
       return false;
     } on ApiException catch (e) {
       if (mounted) {
         await messageDialog(
           context,
-          title:
-              'Ошибка сервера',
+          title: 'Ошибка сервера',
           message: e.message,
         );
       }
@@ -232,128 +197,82 @@ class _SupplierFormScreenState
     if (_loading) {
       return const Scaffold(
         body: Center(
-          child:
-              CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     return EntityFormScaffold(
-      title: widget.isEditing
-          ? 'Редактирование поставщика'
-          : 'Новый поставщик',
-
+      title: widget.isEditing ? 'Редактирование поставщика' : 'Новый поставщик',
       formKey: _formKey,
-
       isDirty: _dirty,
-
-      successLocation:
-          '/suppliers',
-
+      successLocation: '/suppliers',
       onSubmit: _save,
-
       children: [
         TextFormField(
           controller: _name,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Название',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('name');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'name'] ??
-              Validators
-                  .requiredAndMax(
+              _serverErrors['name'] ??
+              Validators.requiredAndMax(
                 value,
                 100,
                 field: 'Название',
               ),
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _country,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Страна',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('country');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'country'] ??
-              Validators
-                  .requiredAndMax(
+              _serverErrors['country'] ??
+              Validators.requiredAndMax(
                 value,
                 60,
                 field: 'Страна',
               ),
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _email,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Email',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('email');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'email'] ??
+              _serverErrors['email'] ??
               Validators.email(
                 value,
               ),
         ),
-
         const SizedBox(height: 14),
-
         MultiSelectField<Category>(
-          label:
-              'Доступные категории',
-
+          label: 'Доступные категории',
           items: _categories,
-
-          selectedIds:
-              _allowedIds,
-
-          idOf:
-              (item) => item.id,
-
-          labelOf:
-              (item) => item.name,
-
+          selectedIds: _allowedIds,
+          idOf: (item) => item.id,
+          labelOf: (item) => item.name,
           validator: (value) =>
-              _serverErrors[
-                  'allowedCategoryIds'] ??
+              _serverErrors['allowedCategoryIds'] ??
               Validators.requiredIds(
                 value,
                 field: 'категории',
               ),
-
           onChanged: (value) {
             setState(() {
               _allowedIds = value;

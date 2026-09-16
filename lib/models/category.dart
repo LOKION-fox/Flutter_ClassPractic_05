@@ -32,11 +32,8 @@ class Category {
       id: id ?? this.id,
       name: name ?? this.name,
       kind: kind ?? this.kind,
-      description:
-          description ?? this.description,
-      deletedAt: clearDeletedAt
-          ? null
-          : (deletedAt ?? this.deletedAt),
+      description: description ?? this.description,
+      deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
     );
   }
 
@@ -46,8 +43,7 @@ class Category {
       'name': name,
       'kind': kind,
       'description': description,
-      'deletedAt':
-          deletedAt?.toIso8601String(),
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
@@ -62,10 +58,8 @@ class Category {
         'kind',
         fallback: 'product',
       ),
-      description:
-          jsonString(json, 'description'),
-      deletedAt:
-          jsonDate(json, 'deletedAt'),
+      description: jsonString(json, 'description'),
+      deletedAt: jsonDate(json, 'deletedAt'),
     );
   }
 }

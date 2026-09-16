@@ -8,8 +8,7 @@ import '../models/page_result.dart';
 import '../models/simple_query.dart';
 import 'customer_repository.dart';
 
-class ApiCustomerRepository
-    implements CustomerRepository {
+class ApiCustomerRepository implements CustomerRepository {
   final ApiClient _api;
   final AuthService _auth;
 
@@ -31,18 +30,15 @@ class ApiCustomerRepository
     _findCancelToken = token;
 
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/customers',
-        queryParameters:
-            query.toApiQueryParameters(
+        queryParameters: query.toApiQueryParameters(
           filterParam: 'level',
         ),
         cancelToken: token,
       );
 
-      return PageResult<Customer>
-          .fromJson(
+      return PageResult<Customer>.fromJson(
         Map<String, dynamic>.from(
           response.data as Map,
         ),
@@ -60,8 +56,7 @@ class ApiCustomerRepository
 
   @override
   Future<List<Customer>> all() async {
-    final response =
-        await _api.get(
+    final response = await _api.get(
       '/customers',
       queryParameters: {
         'page': 1,
@@ -70,8 +65,7 @@ class ApiCustomerRepository
       },
     );
 
-    return PageResult<Customer>
-        .fromJson(
+    return PageResult<Customer>.fromJson(
       Map<String, dynamic>.from(
         response.data as Map,
       ),
@@ -84,8 +78,7 @@ class ApiCustomerRepository
     int id,
   ) async {
     try {
-      final response =
-          await _api.get(
+      final response = await _api.get(
         '/customers/$id',
         queryParameters: {
           'includeDeleted': 'true',
@@ -108,8 +101,7 @@ class ApiCustomerRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/customers',
           data: customer.toJson(),
         );
@@ -185,19 +177,14 @@ class ApiCustomerRepository
   ) {
     return _auth.authorized(
       () async {
-        final response =
-            await _api.post(
+        final response = await _api.post(
           '/customers/bulk-delete',
           data: {
             'ids': ids,
           },
         );
 
-        return (response
-                    .data['deleted']
-                as num?)
-            ?.toInt() ??
-            0;
+        return (response.data['deleted'] as num?)?.toInt() ?? 0;
       },
     );
   }

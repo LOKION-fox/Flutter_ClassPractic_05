@@ -8,8 +8,7 @@ import '../validation/validators.dart';
 import '../widgets/dialogs.dart';
 import '../widgets/entity_form_scaffold.dart';
 
-class CategoryFormScreen
-    extends StatefulWidget {
+class CategoryFormScreen extends StatefulWidget {
   final int? id;
 
   const CategoryFormScreen({
@@ -17,25 +16,18 @@ class CategoryFormScreen
     this.id,
   });
 
-  bool get isEditing =>
-      id != null;
+  bool get isEditing => id != null;
 
   @override
-  State<CategoryFormScreen>
-      createState() =>
-          _CategoryFormScreenState();
+  State<CategoryFormScreen> createState() => _CategoryFormScreenState();
 }
 
-class _CategoryFormScreenState
-    extends State<CategoryFormScreen> {
-  final _formKey =
-      GlobalKey<FormState>();
+class _CategoryFormScreenState extends State<CategoryFormScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  final _name =
-      TextEditingController();
+  final _name = TextEditingController();
 
-  final _description =
-      TextEditingController();
+  final _description = TextEditingController();
 
   String? _kind;
 
@@ -45,8 +37,7 @@ class _CategoryFormScreenState
   bool _loading = true;
   bool _dirty = false;
 
-  Map<String, String>
-      _serverErrors = {};
+  Map<String, String> _serverErrors = {};
 
   @override
   void didChangeDependencies() {
@@ -68,10 +59,8 @@ class _CategoryFormScreenState
     }
 
     try {
-      final value = await context
-          .read<
-              CategoryListNotifier>()
-          .findById(widget.id!);
+      final value =
+          await context.read<CategoryListNotifier>().findById(widget.id!);
 
       if (!mounted) {
         return;
@@ -81,13 +70,11 @@ class _CategoryFormScreenState
         _original = value;
 
         if (value != null) {
-          _name.text =
-              value.name;
+          _name.text = value.name;
 
           _kind = value.kind;
 
-          _description.text =
-              value.description;
+          _description.text = value.description;
         }
 
         _loading = false;
@@ -126,30 +113,20 @@ class _CategoryFormScreenState
       _serverErrors = {};
     });
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return false;
     }
 
     final category = Category(
       id: _original?.id ?? 0,
-
-      name:
-          _name.text.trim(),
-
+      name: _name.text.trim(),
       kind: _kind!,
-
-      description:
-          _description.text.trim(),
-
-      deletedAt:
-          _original?.deletedAt,
+      description: _description.text.trim(),
+      deletedAt: _original?.deletedAt,
     );
 
     try {
-      final notifier =
-          context.read<
-              CategoryListNotifier>();
+      final notifier = context.read<CategoryListNotifier>();
 
       if (widget.isEditing) {
         await notifier.update(
@@ -170,20 +147,17 @@ class _CategoryFormScreenState
       }
 
       setState(() {
-        _serverErrors =
-            e.errors;
+        _serverErrors = e.errors;
       });
 
-      _formKey.currentState
-          ?.validate();
+      _formKey.currentState?.validate();
 
       return false;
     } on ApiException catch (e) {
       if (mounted) {
         await messageDialog(
           context,
-          title:
-              'Ошибка сервера',
+          title: 'Ошибка сервера',
           message: e.message,
         );
       }
@@ -207,65 +181,42 @@ class _CategoryFormScreenState
     if (_loading) {
       return const Scaffold(
         body: Center(
-          child:
-              CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     return EntityFormScaffold(
-      title: widget.isEditing
-          ? 'Редактирование категории'
-          : 'Новая категория',
-
+      title: widget.isEditing ? 'Редактирование категории' : 'Новая категория',
       formKey: _formKey,
-
       isDirty: _dirty,
-
-      successLocation:
-          '/categories',
-
+      successLocation: '/categories',
       onSubmit: _save,
-
       children: [
         TextFormField(
           controller: _name,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Название',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('name');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'name'] ??
-              Validators
-                  .requiredAndMax(
+              _serverErrors['name'] ??
+              Validators.requiredAndMax(
                 value,
                 80,
                 field: 'Название',
               ),
         ),
-
         const SizedBox(height: 14),
-
         DropdownButtonFormField<String>(
           initialValue: _kind,
-
-          decoration:
-              const InputDecoration(
-            labelText:
-                'Тип категории',
-            border:
-                OutlineInputBorder(),
+          decoration: const InputDecoration(
+            labelText: 'Тип категории',
+            border: OutlineInputBorder(),
           ),
-
           items: const [
             DropdownMenuItem(
               value: 'product',
@@ -284,14 +235,8 @@ class _CategoryFormScreenState
               child: Text('Общая'),
             ),
           ],
-
           validator: (value) =>
-              _serverErrors[
-                  'kind'] ??
-              (value == null
-                  ? 'Выберите тип'
-                  : null),
-
+              _serverErrors['kind'] ?? (value == null ? 'Выберите тип' : null),
           onChanged: (value) {
             setState(() {
               _kind = value;
@@ -303,35 +248,24 @@ class _CategoryFormScreenState
             });
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
-          controller:
-              _description,
-
+          controller: _description,
           maxLines: 4,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Описание',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed(
               'description',
             );
           },
-
-          validator: (value) =>
-              Validators
-                  .requiredAndMax(
-                value,
-                300,
-                field: 'Описание',
-              ),
+          validator: (value) => Validators.requiredAndMax(
+            value,
+            300,
+            field: 'Описание',
+          ),
         ),
       ],
     );

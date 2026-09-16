@@ -12,8 +12,7 @@ class Product {
 
   final int supplierId;
 
-  final List<int>
-      categoryIds;
+  final List<int> categoryIds;
 
   final String description;
 
@@ -32,8 +31,7 @@ class Product {
     this.deletedAt,
   });
 
-  bool get isDeleted =>
-      deletedAt != null;
+  bool get isDeleted => deletedAt != null;
 
   Product copyWith({
     int? id,
@@ -50,158 +48,92 @@ class Product {
   }) {
     return Product(
       id: id ?? this.id,
-
-      name:
-          name ?? this.name,
-
-      article:
-          article ??
-              this.article,
-
-      brand:
-          brand ?? this.brand,
-
-      price:
-          price ?? this.price,
-
-      stock:
-          stock ?? this.stock,
-
-      supplierId:
-          supplierId ??
-              this.supplierId,
-
-      categoryIds:
-          categoryIds ??
-              this.categoryIds,
-
-      description:
-          description ??
-              this.description,
-
-      deletedAt:
-          clearDeletedAt
-              ? null
-              : deletedAt ??
-                  this.deletedAt,
+      name: name ?? this.name,
+      article: article ?? this.article,
+      brand: brand ?? this.brand,
+      price: price ?? this.price,
+      stock: stock ?? this.stock,
+      supplierId: supplierId ?? this.supplierId,
+      categoryIds: categoryIds ?? this.categoryIds,
+      description: description ?? this.description,
+      deletedAt: clearDeletedAt ? null : deletedAt ?? this.deletedAt,
     );
   }
 
-  Map<String, dynamic>
-      toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'article': article,
       'brand': brand,
       'price': price,
       'stock': stock,
-      'supplierId':
-          supplierId,
-      'categoryIds':
-          categoryIds,
-      'description':
-          description,
+      'supplierId': supplierId,
+      'categoryIds': categoryIds,
+      'description': description,
     };
   }
 
   factory Product.fromJson(
     Map<String, dynamic> json,
   ) {
-    var supplierId =
-        jsonInt(
+    var supplierId = jsonInt(
       json,
       'supplierId',
     );
 
-    final supplier =
-        json['supplier'];
+    final supplier = json['supplier'];
 
-    if (
-      supplierId == 0 &&
-      supplier is Map
-    ) {
-      supplierId =
-          (supplier['id'] as num?)
-                  ?.toInt() ??
-              0;
+    if (supplierId == 0 && supplier is Map) {
+      supplierId = (supplier['id'] as num?)?.toInt() ?? 0;
     }
 
-    var categoryIds =
-        jsonIntList(
+    var categoryIds = jsonIntList(
       json,
       'categoryIds',
     );
 
-    if (
-      categoryIds.isEmpty &&
-      json['categories']
-          is List
-    ) {
-      categoryIds =
-          (json['categories']
-                  as List)
-              .whereType<Map>()
-              .map(
-                (item) =>
-                    (item['id']
-                            as num?)
-                        ?.toInt(),
-              )
-              .whereType<int>()
-              .toList();
+    if (categoryIds.isEmpty && json['categories'] is List) {
+      categoryIds = (json['categories'] as List)
+          .whereType<Map>()
+          .map(
+            (item) => (item['id'] as num?)?.toInt(),
+          )
+          .whereType<int>()
+          .toList();
     }
 
     return Product(
-      id:
-          jsonInt(
+      id: jsonInt(
         json,
         'id',
       ),
-
-      name:
-          jsonString(
+      name: jsonString(
         json,
         'name',
       ),
-
-      article:
-          jsonString(
+      article: jsonString(
         json,
         'article',
       ),
-
-      brand:
-          jsonString(
+      brand: jsonString(
         json,
         'brand',
       ),
-
-      price:
-          jsonDouble(
+      price: jsonDouble(
         json,
         'price',
       ),
-
-      stock:
-          jsonInt(
+      stock: jsonInt(
         json,
         'stock',
       ),
-
-      supplierId:
-          supplierId,
-
-      categoryIds:
-          categoryIds,
-
-      description:
-          jsonString(
+      supplierId: supplierId,
+      categoryIds: categoryIds,
+      description: jsonString(
         json,
         'description',
       ),
-
-      deletedAt:
-          jsonDate(
+      deletedAt: jsonDate(
         json,
         'deletedAt',
       ),

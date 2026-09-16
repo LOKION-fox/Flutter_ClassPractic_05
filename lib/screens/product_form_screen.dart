@@ -13,8 +13,7 @@ import '../widgets/dialogs.dart';
 import '../widgets/entity_form_scaffold.dart';
 import '../widgets/multi_select_field.dart';
 
-class ProductFormScreen
-    extends StatefulWidget {
+class ProductFormScreen extends StatefulWidget {
   final int? id;
 
   const ProductFormScreen({
@@ -22,37 +21,26 @@ class ProductFormScreen
     this.id,
   });
 
-  bool get isEditing =>
-      id != null;
+  bool get isEditing => id != null;
 
   @override
-  State<ProductFormScreen>
-      createState() =>
-          _ProductFormScreenState();
+  State<ProductFormScreen> createState() => _ProductFormScreenState();
 }
 
-class _ProductFormScreenState
-    extends State<ProductFormScreen> {
-  final _formKey =
-      GlobalKey<FormState>();
+class _ProductFormScreenState extends State<ProductFormScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  final _name =
-      TextEditingController();
+  final _name = TextEditingController();
 
-  final _article =
-      TextEditingController();
+  final _article = TextEditingController();
 
-  final _brand =
-      TextEditingController();
+  final _brand = TextEditingController();
 
-  final _price =
-      TextEditingController();
+  final _price = TextEditingController();
 
-  final _stock =
-      TextEditingController();
+  final _stock = TextEditingController();
 
-  final _description =
-      TextEditingController();
+  final _description = TextEditingController();
 
   List<Category> _categories = [];
 
@@ -70,8 +58,7 @@ class _ProductFormScreenState
 
   String? _loadError;
 
-  Map<String, String>
-      _serverErrors = {};
+  Map<String, String> _serverErrors = {};
 
   @override
   void didChangeDependencies() {
@@ -86,24 +73,15 @@ class _ProductFormScreenState
   Future<void> _load() async {
     try {
       final categories =
-          await context
-              .read<
-                  CategoryListNotifier>()
-              .getAllActive();
+          await context.read<CategoryListNotifier>().getAllActive();
 
       final suppliers =
-          await context
-              .read<
-                  SupplierListNotifier>()
-              .getAllActive();
+          await context.read<SupplierListNotifier>().getAllActive();
 
       Product? product;
 
       if (widget.id != null) {
-        product = await context
-            .read<
-                ProductListNotifier>()
-            .findById(
+        product = await context.read<ProductListNotifier>().findById(
               widget.id!,
             );
       }
@@ -119,28 +97,19 @@ class _ProductFormScreenState
         _original = product;
 
         if (product != null) {
-          _name.text =
-              product.name;
+          _name.text = product.name;
 
-          _article.text =
-              product.article;
+          _article.text = product.article;
 
-          _brand.text =
-              product.brand;
+          _brand.text = product.brand;
 
-          _price.text =
-              product.price
-                  .toString();
+          _price.text = product.price.toString();
 
-          _stock.text =
-              product.stock
-                  .toString();
+          _stock.text = product.stock.toString();
 
-          _description.text =
-              product.description;
+          _description.text = product.description;
 
-          _supplierId =
-              product.supplierId;
+          _supplierId = product.supplierId;
 
           _categoryIds = [
             ...product.categoryIds,
@@ -157,8 +126,7 @@ class _ProductFormScreenState
       setState(() {
         _loading = false;
 
-        _loadError =
-            e.toString();
+        _loadError = e.toString();
       });
     }
   }
@@ -176,10 +144,8 @@ class _ProductFormScreenState
   }
 
   Supplier? get _supplier {
-    for (final supplier
-        in _suppliers) {
-      if (supplier.id ==
-          _supplierId) {
+    for (final supplier in _suppliers) {
+      if (supplier.id == _supplierId) {
         return supplier;
       }
     }
@@ -187,8 +153,7 @@ class _ProductFormScreenState
     return null;
   }
 
-  List<Category>
-      get _availableCategories {
+  List<Category> get _availableCategories {
     final supplier = _supplier;
 
     if (supplier == null) {
@@ -198,17 +163,12 @@ class _ProductFormScreenState
     return _categories.where(
       (category) {
         final correctKind =
-            category.kind ==
-                    'product' ||
-                category.kind ==
-                    'both';
+            category.kind == 'product' || category.kind == 'both';
 
         return correctKind &&
-            supplier
-                .allowedCategoryIds
-                .contains(
-                  category.id,
-                );
+            supplier.allowedCategoryIds.contains(
+              category.id,
+            );
       },
     ).toList();
   }
@@ -218,51 +178,31 @@ class _ProductFormScreenState
       _serverErrors = {};
     });
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return false;
     }
 
     final product = Product(
       id: _original?.id ?? 0,
-
-      name:
-          _name.text.trim(),
-
-      article:
-          _article.text.trim(),
-
-      brand:
-          _brand.text.trim(),
-
+      name: _name.text.trim(),
+      article: _article.text.trim(),
+      brand: _brand.text.trim(),
       price: double.parse(
-        _price.text
-            .replaceAll(',', '.'),
+        _price.text.replaceAll(',', '.'),
       ),
-
-      stock:
-          int.parse(
+      stock: int.parse(
         _stock.text,
       ),
-
-      supplierId:
-          _supplierId!,
-
+      supplierId: _supplierId!,
       categoryIds: [
         ..._categoryIds,
       ],
-
-      description:
-          _description.text.trim(),
-
-      deletedAt:
-          _original?.deletedAt,
+      description: _description.text.trim(),
+      deletedAt: _original?.deletedAt,
     );
 
     try {
-      final notifier =
-          context.read<
-              ProductListNotifier>();
+      final notifier = context.read<ProductListNotifier>();
 
       if (widget.isEditing) {
         await notifier.update(
@@ -283,20 +223,17 @@ class _ProductFormScreenState
       }
 
       setState(() {
-        _serverErrors =
-            e.errors;
+        _serverErrors = e.errors;
       });
 
-      _formKey.currentState
-          ?.validate();
+      _formKey.currentState?.validate();
 
       return false;
     } on ApiException catch (e) {
       if (mounted) {
         await messageDialog(
           context,
-          title:
-              'Ошибка сервера',
+          title: 'Ошибка сервера',
           message: e.message,
         );
       }
@@ -324,8 +261,7 @@ class _ProductFormScreenState
     if (_loading) {
       return const Scaffold(
         body: Center(
-          child:
-              CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -345,8 +281,7 @@ class _ProductFormScreenState
       );
     }
 
-    if (widget.isEditing &&
-        _original == null) {
+    if (widget.isEditing && _original == null) {
       return const Scaffold(
         body: Center(
           child: Text(
@@ -357,120 +292,77 @@ class _ProductFormScreenState
     }
 
     return EntityFormScaffold(
-      title: widget.isEditing
-          ? 'Редактирование товара'
-          : 'Новый товар',
-
+      title: widget.isEditing ? 'Редактирование товара' : 'Новый товар',
       formKey: _formKey,
-
       isDirty: _dirty,
-
-      successLocation:
-          '/products',
-
-      submitText: widget.isEditing
-          ? 'Сохранить изменения'
-          : 'Создать товар',
-
+      successLocation: '/products',
+      submitText: widget.isEditing ? 'Сохранить изменения' : 'Создать товар',
       onSubmit: _save,
-
       children: [
         TextFormField(
           controller: _name,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Название',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('name');
           },
-
           validator: (value) {
-            return _serverErrors[
-                    'name'] ??
-                Validators
-                    .requiredAndMax(
+            return _serverErrors['name'] ??
+                Validators.requiredAndMax(
                   value,
                   100,
                   field: 'Название',
                 );
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _article,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Артикул',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('article');
           },
-
           validator: (value) {
-            return _serverErrors[
-                    'article'] ??
-                Validators
-                    .requiredAndMax(
+            return _serverErrors['article'] ??
+                Validators.requiredAndMax(
                   value,
                   30,
                   field: 'Артикул',
                 );
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _brand,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Бренд',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('brand');
           },
-
           validator: (value) {
-            return _serverErrors[
-                    'brand'] ??
-                Validators
-                    .requiredAndMax(
+            return _serverErrors['brand'] ??
+                Validators.requiredAndMax(
                   value,
                   60,
                   field: 'Бренд',
                 );
           },
         ),
-
         const SizedBox(height: 14),
-
         DropdownButtonFormField<int>(
           initialValue: _supplierId,
-
           isExpanded: true,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Поставщик',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           items: _suppliers.map(
             (supplier) {
               return DropdownMenuItem<int>(
@@ -481,17 +373,13 @@ class _ProductFormScreenState
               );
             },
           ).toList(),
-
           validator: (value) {
-            return _serverErrors[
-                    'supplierId'] ??
+            return _serverErrors['supplierId'] ??
                 Validators.requiredId(
                   value,
-                  field:
-                      'поставщика',
+                  field: 'поставщика',
                 );
           },
-
           onChanged: (value) {
             setState(() {
               _supplierId = value;
@@ -504,57 +392,37 @@ class _ProductFormScreenState
                 'categoryIds',
               );
 
-              final supplier =
-                  _supplier;
+              final supplier = _supplier;
 
               if (supplier != null) {
-                _categoryIds =
-                    _categoryIds
-                        .where(
-                          supplier
-                              .allowedCategoryIds
-                              .contains,
-                        )
-                        .toList();
+                _categoryIds = _categoryIds
+                    .where(
+                      supplier.allowedCategoryIds.contains,
+                    )
+                    .toList();
               }
 
               _dirty = true;
             });
           },
         ),
-
         const SizedBox(height: 14),
-
         MultiSelectField<Category>(
           label: 'Категории',
-
-          items:
-              _availableCategories,
-
-          selectedIds:
-              _categoryIds,
-
-          idOf:
-              (category) =>
-                  category.id,
-
-          labelOf:
-              (category) =>
-                  category.name,
-
+          items: _availableCategories,
+          selectedIds: _categoryIds,
+          idOf: (category) => category.id,
+          labelOf: (category) => category.name,
           validator: (value) {
-            return _serverErrors[
-                    'categoryIds'] ??
+            return _serverErrors['categoryIds'] ??
                 Validators.requiredIds(
                   value,
                   field: 'категории',
                 );
           },
-
           onChanged: (value) {
             setState(() {
-              _categoryIds =
-                  value;
+              _categoryIds = value;
 
               _serverErrors.remove(
                 'categoryIds',
@@ -564,29 +432,19 @@ class _ProductFormScreenState
             });
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _price,
-
-          keyboardType:
-              TextInputType.number,
-
-          decoration:
-              const InputDecoration(
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
             labelText: 'Цена, ₽',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('price');
           },
-
           validator: (value) {
-            return _serverErrors[
-                    'price'] ??
+            return _serverErrors['price'] ??
                 Validators.numberRange(
                   value,
                   min: 1,
@@ -595,64 +453,42 @@ class _ProductFormScreenState
                 );
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _stock,
-
-          keyboardType:
-              TextInputType.number,
-
-          decoration:
-              const InputDecoration(
-            labelText:
-                'Количество на складе',
-            border:
-                OutlineInputBorder(),
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Количество на складе',
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('stock');
           },
-
           validator: (value) {
-            return _serverErrors[
-                    'stock'] ??
+            return _serverErrors['stock'] ??
                 Validators.integerRange(
                   value,
                   min: 0,
                   max: 100000,
-                  field:
-                      'Количество',
+                  field: 'Количество',
                 );
           },
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
-          controller:
-              _description,
-
+          controller: _description,
           maxLines: 4,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Описание',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed(
               'description',
             );
           },
-
           validator: (value) {
-            return Validators
-                .requiredAndMax(
+            return Validators.requiredAndMax(
               value,
               500,
               field: 'Описание',

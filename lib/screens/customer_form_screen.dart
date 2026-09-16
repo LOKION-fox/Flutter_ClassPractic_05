@@ -8,8 +8,7 @@ import '../validation/validators.dart';
 import '../widgets/dialogs.dart';
 import '../widgets/entity_form_scaffold.dart';
 
-class CustomerFormScreen
-    extends StatefulWidget {
+class CustomerFormScreen extends StatefulWidget {
   final int? id;
 
   const CustomerFormScreen({
@@ -17,37 +16,26 @@ class CustomerFormScreen
     this.id,
   });
 
-  bool get isEditing =>
-      id != null;
+  bool get isEditing => id != null;
 
   @override
-  State<CustomerFormScreen>
-      createState() =>
-          _CustomerFormScreenState();
+  State<CustomerFormScreen> createState() => _CustomerFormScreenState();
 }
 
-class _CustomerFormScreenState
-    extends State<CustomerFormScreen> {
-  final _formKey =
-      GlobalKey<FormState>();
+class _CustomerFormScreenState extends State<CustomerFormScreen> {
+  final _formKey = GlobalKey<FormState>();
 
-  final _firstName =
-      TextEditingController();
+  final _firstName = TextEditingController();
 
-  final _lastName =
-      TextEditingController();
+  final _lastName = TextEditingController();
 
-  final _email =
-      TextEditingController();
+  final _email = TextEditingController();
 
-  final _phone =
-      TextEditingController();
+  final _phone = TextEditingController();
 
-  final _cardNumber =
-      TextEditingController();
+  final _cardNumber = TextEditingController();
 
-  final _points =
-      TextEditingController();
+  final _points = TextEditingController();
 
   String? _level;
 
@@ -57,8 +45,7 @@ class _CustomerFormScreenState
   bool _loading = true;
   bool _dirty = false;
 
-  Map<String, String>
-      _serverErrors = {};
+  Map<String, String> _serverErrors = {};
 
   @override
   void didChangeDependencies() {
@@ -83,13 +70,9 @@ class _CustomerFormScreenState
     }
 
     try {
-      final customer =
-          await context
-              .read<
-                  CustomerListNotifier>()
-              .findById(
-                widget.id!,
-              );
+      final customer = await context.read<CustomerListNotifier>().findById(
+            widget.id!,
+          );
 
       if (!mounted) {
         return;
@@ -99,33 +82,19 @@ class _CustomerFormScreenState
         _original = customer;
 
         if (customer != null) {
-          _firstName.text =
-              customer.firstName;
+          _firstName.text = customer.firstName;
 
-          _lastName.text =
-              customer.lastName;
+          _lastName.text = customer.lastName;
 
-          _email.text =
-              customer.email;
+          _email.text = customer.email;
 
-          _phone.text =
-              customer.phone;
+          _phone.text = customer.phone;
 
-          _cardNumber.text =
-              customer
-                  .loyaltyCard
-                  .number;
+          _cardNumber.text = customer.loyaltyCard.number;
 
-          _points.text =
-              customer
-                  .loyaltyCard
-                  .points
-                  .toString();
+          _points.text = customer.loyaltyCard.points.toString();
 
-          _level =
-              customer
-                  .loyaltyCard
-                  .level;
+          _level = customer.loyaltyCard.level;
         }
 
         _loading = false;
@@ -164,54 +133,31 @@ class _CustomerFormScreenState
       _serverErrors = {};
     });
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return false;
     }
 
     final card = LoyaltyCard(
-      number:
-          _cardNumber.text.trim(),
-
+      number: _cardNumber.text.trim(),
       level: _level!,
-
-      points:
-          int.parse(
+      points: int.parse(
         _points.text,
       ),
-
-      issuedAt:
-          _original
-                  ?.loyaltyCard
-                  .issuedAt ??
-              DateTime.now(),
+      issuedAt: _original?.loyaltyCard.issuedAt ?? DateTime.now(),
     );
 
     final customer = Customer(
       id: _original?.id ?? 0,
-
-      firstName:
-          _firstName.text.trim(),
-
-      lastName:
-          _lastName.text.trim(),
-
-      email:
-          _email.text.trim(),
-
-      phone:
-          _phone.text.trim(),
-
+      firstName: _firstName.text.trim(),
+      lastName: _lastName.text.trim(),
+      email: _email.text.trim(),
+      phone: _phone.text.trim(),
       loyaltyCard: card,
-
-      deletedAt:
-          _original?.deletedAt,
+      deletedAt: _original?.deletedAt,
     );
 
     try {
-      final notifier =
-          context.read<
-              CustomerListNotifier>();
+      final notifier = context.read<CustomerListNotifier>();
 
       if (widget.isEditing) {
         await notifier.update(
@@ -232,20 +178,17 @@ class _CustomerFormScreenState
       }
 
       setState(() {
-        _serverErrors =
-            e.errors;
+        _serverErrors = e.errors;
       });
 
-      _formKey.currentState
-          ?.validate();
+      _formKey.currentState?.validate();
 
       return false;
     } on ApiException catch (e) {
       if (mounted) {
         await messageDialog(
           context,
-          title:
-              'Ошибка сервера',
+          title: 'Ошибка сервера',
           message: e.message,
         );
       }
@@ -273,277 +216,184 @@ class _CustomerFormScreenState
     if (_loading) {
       return const Scaffold(
         body: Center(
-          child:
-              CircularProgressIndicator(),
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
     return EntityFormScaffold(
-      title: widget.isEditing
-          ? 'Редактирование покупателя'
-          : 'Новый покупатель',
-
+      title:
+          widget.isEditing ? 'Редактирование покупателя' : 'Новый покупатель',
       formKey: _formKey,
-
       isDirty: _dirty,
-
-      successLocation:
-          '/customers',
-
+      successLocation: '/customers',
       onSubmit: _save,
-
       children: [
         TextFormField(
           controller: _lastName,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Фамилия',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('lastName');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'lastName'] ??
-              Validators
-                  .requiredAndMax(
+              _serverErrors['lastName'] ??
+              Validators.requiredAndMax(
                 value,
                 80,
                 field: 'Фамилия',
               ),
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _firstName,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Имя',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed(
               'firstName',
             );
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'firstName'] ??
-              Validators
-                  .requiredAndMax(
+              _serverErrors['firstName'] ??
+              Validators.requiredAndMax(
                 value,
                 80,
                 field: 'Имя',
               ),
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _email,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Email',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('email');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'email'] ??
+              _serverErrors['email'] ??
               Validators.email(
                 value,
               ),
         ),
-
         const SizedBox(height: 14),
-
         TextFormField(
           controller: _phone,
-
-          decoration:
-              const InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Телефон',
-            border:
-                OutlineInputBorder(),
+            border: OutlineInputBorder(),
           ),
-
           onChanged: (_) {
             _changed('phone');
           },
-
           validator: (value) =>
-              _serverErrors[
-                  'phone'] ??
+              _serverErrors['phone'] ??
               Validators.phone(
                 value,
               ),
         ),
-
         const SizedBox(height: 24),
-
         Card(
           child: Padding(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               16,
             ),
-
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .stretch,
-
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   'Карта лояльности',
-                  style:
-                      Theme.of(context)
-                          .textTheme
-                          .titleLarge,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-
                 const SizedBox(
                   height: 14,
                 ),
-
                 TextFormField(
-                  controller:
-                      _cardNumber,
-
-                  decoration:
-                      const InputDecoration(
-                    labelText:
-                        'Номер карты',
-                    border:
-                        OutlineInputBorder(),
+                  controller: _cardNumber,
+                  decoration: const InputDecoration(
+                    labelText: 'Номер карты',
+                    border: OutlineInputBorder(),
                   ),
-
                   onChanged: (_) {
                     _changed(
                       'loyaltyCardNumber',
                     );
                   },
-
                   validator: (value) =>
-                      _serverErrors[
-                          'loyaltyCardNumber'] ??
-                      Validators
-                          .requiredAndMax(
+                      _serverErrors['loyaltyCardNumber'] ??
+                      Validators.requiredAndMax(
                         value,
                         30,
-                        field:
-                            'Номер карты',
+                        field: 'Номер карты',
                       ),
                 ),
-
                 const SizedBox(
                   height: 14,
                 ),
-
-                DropdownButtonFormField<
-                    String>(
+                DropdownButtonFormField<String>(
                   initialValue: _level,
-
-                  decoration:
-                      const InputDecoration(
-                    labelText:
-                        'Уровень карты',
-                    border:
-                        OutlineInputBorder(),
+                  decoration: const InputDecoration(
+                    labelText: 'Уровень карты',
+                    border: OutlineInputBorder(),
                   ),
-
                   items: const [
                     DropdownMenuItem(
                       value: 'Silver',
-                      child:
-                          Text('Silver'),
+                      child: Text('Silver'),
                     ),
                     DropdownMenuItem(
                       value: 'Gold',
-                      child:
-                          Text('Gold'),
+                      child: Text('Gold'),
                     ),
                     DropdownMenuItem(
-                      value:
-                          'Platinum',
+                      value: 'Platinum',
                       child: Text(
                         'Platinum',
                       ),
                     ),
                   ],
-
                   validator: (value) =>
-                      _serverErrors[
-                          'loyaltyCardLevel'] ??
-                      (value == null
-                          ? 'Выберите уровень'
-                          : null),
-
+                      _serverErrors['loyaltyCardLevel'] ??
+                      (value == null ? 'Выберите уровень' : null),
                   onChanged: (value) {
                     setState(() {
                       _level = value;
                       _dirty = true;
 
-                      _serverErrors
-                          .remove(
+                      _serverErrors.remove(
                         'loyaltyCardLevel',
                       );
                     });
                   },
                 ),
-
                 const SizedBox(
                   height: 14,
                 ),
-
                 TextFormField(
                   controller: _points,
-
-                  keyboardType:
-                      TextInputType
-                          .number,
-
-                  decoration:
-                      const InputDecoration(
-                    labelText:
-                        'Бонусные баллы',
-                    border:
-                        OutlineInputBorder(),
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Бонусные баллы',
+                    border: OutlineInputBorder(),
                   ),
-
                   onChanged: (_) {
                     _changed(
                       'loyaltyCardPoints',
                     );
                   },
-
                   validator: (value) =>
-                      _serverErrors[
-                          'loyaltyCardPoints'] ??
-                      Validators
-                          .integerRange(
+                      _serverErrors['loyaltyCardPoints'] ??
+                      Validators.integerRange(
                         value,
                         min: 0,
                         max: 1000000,
-                        field:
-                            'Количество баллов',
+                        field: 'Количество баллов',
                       ),
                 ),
               ],

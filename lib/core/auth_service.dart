@@ -71,8 +71,7 @@ class AuthService {
   }
 
   Future<AppUser> me() async {
-    final response =
-        await api.get('/auth/me');
+    final response = await api.get('/auth/me');
 
     return AppUser.fromJson(
       Map<String, dynamic>.from(

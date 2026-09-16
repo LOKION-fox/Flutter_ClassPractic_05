@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/supplier.dart';
 import '../state/supplier_list_notifier.dart';
 
-class SupplierDetailsScreen
-    extends StatelessWidget {
+class SupplierDetailsScreen extends StatelessWidget {
   final int id;
 
   const SupplierDetailsScreen({
@@ -18,19 +17,14 @@ class SupplierDetailsScreen
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Поставщик'),
+        title: const Text('Поставщик'),
       ),
       body: FutureBuilder<Supplier?>(
-        future: context
-            .read<SupplierListNotifier>()
-            .findById(id),
+        future: context.read<SupplierListNotifier>().findById(id),
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             );
           }
 
@@ -42,8 +36,7 @@ class SupplierDetailsScreen
             );
           }
 
-          final value =
-              snapshot.data;
+          final value = snapshot.data;
 
           if (value == null) {
             return const Center(
@@ -54,17 +47,13 @@ class SupplierDetailsScreen
           }
 
           return ListView(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
             children: [
               Text(
                 value.name,
-                style:
-                    Theme.of(context)
-                        .textTheme
-                        .headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(
                 height: 16,
@@ -83,15 +72,15 @@ class SupplierDetailsScreen
               ),
               if (!value.isDeleted)
                 FilledButton(
-                onPressed: () {
-                  context.push(
-                    '/suppliers/$id/edit',
-                  );
-                },
-                child: const Text(
-                  'Редактировать',
+                  onPressed: () {
+                    context.push(
+                      '/suppliers/$id/edit',
+                    );
+                  },
+                  child: const Text(
+                    'Редактировать',
+                  ),
                 ),
-              ),
             ],
           );
         },

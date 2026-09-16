@@ -27,12 +27,10 @@ class AnimalListScreen extends StatefulWidget {
   });
 
   @override
-  State<AnimalListScreen> createState() =>
-      _AnimalListScreenState();
+  State<AnimalListScreen> createState() => _AnimalListScreenState();
 }
 
-class _AnimalListScreenState
-    extends State<AnimalListScreen> {
+class _AnimalListScreenState extends State<AnimalListScreen> {
   List<Supplier> _suppliers = [];
 
   @override
@@ -41,16 +39,13 @@ class _AnimalListScreenState
 
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        await context
-            .read<AnimalListNotifier>()
-            .applyQuery(
+        await context.read<AnimalListNotifier>().applyQuery(
               widget.initialQuery,
             );
 
         try {
-          final suppliers = await context
-              .read<SupplierListNotifier>()
-              .getAllActive();
+          final suppliers =
+              await context.read<SupplierListNotifier>().getAllActive();
 
           if (!mounted) {
             return;
@@ -93,9 +88,7 @@ class _AnimalListScreenState
   ) async {
     final confirmed = await confirmDialog(
       context,
-      title: hard
-          ? 'Физическое удаление'
-          : 'Удаление',
+      title: hard ? 'Физическое удаление' : 'Удаление',
       message: hard
           ? 'Удалить животное '
               '«${animal.name}» навсегда? '
@@ -109,8 +102,7 @@ class _AnimalListScreenState
       return;
     }
 
-    final notifier =
-        context.read<AnimalListNotifier>();
+    final notifier = context.read<AnimalListNotifier>();
 
     try {
       if (hard) {
@@ -148,8 +140,7 @@ class _AnimalListScreenState
   Future<void> _restore(
     Animal animal,
   ) async {
-    final notifier =
-        context.read<AnimalListNotifier>();
+    final notifier = context.read<AnimalListNotifier>();
 
     try {
       await notifier.restore(
@@ -215,14 +206,11 @@ class _AnimalListScreenState
   Widget build(
     BuildContext context,
   ) {
-    final notifier =
-        context.watch<AnimalListNotifier>();
+    final notifier = context.watch<AnimalListNotifier>();
 
-    final auth =
-        context.watch<AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final query =
-        widget.initialQuery;
+    final query = widget.initialQuery;
 
     final canManage = auth.can(
       AppPermission.manageCatalog,
@@ -236,9 +224,7 @@ class _AnimalListScreenState
       AppPermission.restore,
     );
 
-    final selected = canManage
-        ? notifier.selected
-        : const <int>{};
+    final selected = canManage ? notifier.selected : const <int>{};
 
     return EntityListScaffold<Animal>(
       title: 'Животные',
@@ -247,18 +233,14 @@ class _AnimalListScreenState
         query: query,
         suppliers: _suppliers,
         onChanged: _change,
-        showDeletedToggle:
-            canManage,
+        showDeletedToggle: canManage,
       ),
 
-      status:
-          notifier.status,
+      status: notifier.status,
 
-      error:
-          notifier.error,
+      error: notifier.error,
 
-      items:
-          notifier.result.items,
+      items: notifier.result.items,
 
       selected: selected,
 
@@ -267,110 +249,78 @@ class _AnimalListScreenState
       // ======================================================
 
       table: EntityTable<Animal>(
-        items:
-            notifier.result.items,
-
-        idOf: (animal) =>
-            animal.id,
-
+        items: notifier.result.items,
+        idOf: (animal) => animal.id,
         selected: selected,
-
-        selectionEnabled:
-            canManage,
-
-        onToggleSelect:
-            notifier.toggleSelection,
-
-        sortField:
-            query.sortField,
-
-        sortAscending:
-            query.sortAscending,
-
+        selectionEnabled: canManage,
+        onToggleSelect: notifier.toggleSelection,
+        sortField: query.sortField,
+        sortAscending: query.sortAscending,
         onSort: (field) {
           _change(
             query.copyWith(
               sortField: field,
-
               sortAscending:
-                  field ==
-                          query.sortField
-                      ? !query
-                          .sortAscending
-                      : true,
+                  field == query.sortField ? !query.sortAscending : true,
             ),
           );
         },
-
         columns: [
           TableColumnSpec<Animal>(
             label: 'Имя',
             sortField: 'name',
-
             build: (animal) {
               return Text(
                 animal.name,
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Вид',
-
             build: (animal) {
               return Text(
                 animal.species,
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Порода',
-
             build: (animal) {
               return Text(
                 animal.breed,
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Возраст',
             sortField: 'age',
             numeric: true,
-
             build: (animal) {
               return Text(
                 '${animal.ageMonths} мес.',
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Пол',
-
             build: (animal) {
               return Text(
                 animal.sex,
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Страна',
-
             build: (animal) {
               return Text(
                 animal.country,
               );
             },
           ),
-
           TableColumnSpec<Animal>(
             label: 'Цена',
             sortField: 'price',
             numeric: true,
-
             build: (animal) {
               return Text(
                 '${animal.price.toStringAsFixed(0)} ₽',
@@ -378,17 +328,14 @@ class _AnimalListScreenState
             },
           ),
         ],
-
         actions: (animal) {
           return [
             // Просмотр разрешён всем.
             IconButton(
               tooltip: 'Просмотр',
-
               icon: const Icon(
                 Icons.visibility,
               ),
-
               onPressed: () {
                 context.push(
                   '/animals/${animal.id}',
@@ -397,16 +344,12 @@ class _AnimalListScreenState
             ),
 
             // manager/admin
-            if (canManage &&
-                !animal.isDeleted)
+            if (canManage && !animal.isDeleted)
               IconButton(
-                tooltip:
-                    'Редактировать',
-
+                tooltip: 'Редактировать',
                 icon: const Icon(
                   Icons.edit,
                 ),
-
                 onPressed: () {
                   context.push(
                     '/animals/'
@@ -416,16 +359,12 @@ class _AnimalListScreenState
               ),
 
             // manager/admin
-            if (canManage &&
-                !animal.isDeleted)
+            if (canManage && !animal.isDeleted)
               IconButton(
-                tooltip:
-                    'Логически удалить',
-
+                tooltip: 'Логически удалить',
                 icon: const Icon(
                   Icons.delete_outline,
                 ),
-
                 onPressed: () {
                   _delete(
                     animal,
@@ -435,16 +374,12 @@ class _AnimalListScreenState
               ),
 
             // Только admin.
-            if (canRestore &&
-                animal.isDeleted)
+            if (canRestore && animal.isDeleted)
               IconButton(
-                tooltip:
-                    'Восстановить',
-
+                tooltip: 'Восстановить',
                 icon: const Icon(
                   Icons.restore,
                 ),
-
                 onPressed: () {
                   _restore(
                     animal,
@@ -455,13 +390,10 @@ class _AnimalListScreenState
             // Только admin.
             if (canHardDelete)
               IconButton(
-                tooltip:
-                    'Удалить навсегда',
-
+                tooltip: 'Удалить навсегда',
                 icon: const Icon(
                   Icons.delete_forever,
                 ),
-
                 onPressed: () {
                   _delete(
                     animal,
@@ -478,26 +410,18 @@ class _AnimalListScreenState
       // ======================================================
 
       cardBuilder: (animal) {
-        final hasActions =
-            (canManage &&
-                    !animal.isDeleted) ||
-                (canRestore &&
-                    animal.isDeleted) ||
-                canHardDelete;
+        final hasActions = (canManage && !animal.isDeleted) ||
+            (canRestore && animal.isDeleted) ||
+            canHardDelete;
 
         return Card(
           child: ListTile(
             leading: Icon(
-              animal.isDeleted
-                  ? Icons
-                      .pets_outlined
-                  : Icons.pets,
+              animal.isDeleted ? Icons.pets_outlined : Icons.pets,
             ),
-
             title: Text(
               animal.name,
             ),
-
             subtitle: Text(
               'Вид: ${animal.species}\n'
               'Порода: ${animal.breed}\n'
@@ -507,15 +431,12 @@ class _AnimalListScreenState
               '${animal.price.toStringAsFixed(0)} ₽'
               '${animal.isDeleted ? '\nУдалено' : ''}',
             ),
-
             isThreeLine: true,
-
             onTap: () {
               context.push(
                 '/animals/${animal.id}',
               );
             },
-
             trailing: hasActions
                 ? PopupMenuButton<String>(
                     onSelected: (value) {
@@ -524,16 +445,11 @@ class _AnimalListScreenState
                         animal,
                       );
                     },
-
-                    itemBuilder:
-                        (context) {
+                    itemBuilder: (context) {
                       return [
-                        if (canManage &&
-                            !animal
-                                .isDeleted)
+                        if (canManage && !animal.isDeleted)
                           const PopupMenuItem(
                             value: 'edit',
-
                             child: ListTile(
                               leading: Icon(
                                 Icons.edit,
@@ -543,31 +459,21 @@ class _AnimalListScreenState
                               ),
                             ),
                           ),
-
-                        if (canManage &&
-                            !animal
-                                .isDeleted)
+                        if (canManage && !animal.isDeleted)
                           const PopupMenuItem(
-                            value:
-                                'softDelete',
-
+                            value: 'softDelete',
                             child: ListTile(
                               leading: Icon(
-                                Icons
-                                    .delete_outline,
+                                Icons.delete_outline,
                               ),
                               title: Text(
                                 'Удалить',
                               ),
                             ),
                           ),
-
-                        if (canRestore &&
-                            animal
-                                .isDeleted)
+                        if (canRestore && animal.isDeleted)
                           const PopupMenuItem(
                             value: 'restore',
-
                             child: ListTile(
                               leading: Icon(
                                 Icons.restore,
@@ -577,16 +483,12 @@ class _AnimalListScreenState
                               ),
                             ),
                           ),
-
                         if (canHardDelete)
                           const PopupMenuItem(
-                            value:
-                                'hardDelete',
-
+                            value: 'hardDelete',
                             child: ListTile(
                               leading: Icon(
-                                Icons
-                                    .delete_forever,
+                                Icons.delete_forever,
                               ),
                               title: Text(
                                 'Удалить навсегда',
@@ -601,12 +503,9 @@ class _AnimalListScreenState
         );
       },
 
-      onDeleteSelected: canManage
-          ? notifier.deleteSelected
-          : () async {},
+      onDeleteSelected: canManage ? notifier.deleteSelected : () async {},
 
-      onRetry:
-          notifier.load,
+      onRetry: notifier.load,
 
       onCreate: canManage
           ? () {
@@ -616,17 +515,13 @@ class _AnimalListScreenState
             }
           : null,
 
-      page:
-          notifier.result.page,
+      page: notifier.result.page,
 
-      totalPages:
-          notifier.result.totalPages,
+      totalPages: notifier.result.totalPages,
 
-      total:
-          notifier.result.total,
+      total: notifier.result.total,
 
-      size:
-          notifier.result.size,
+      size: notifier.result.size,
 
       onPageChanged: (page) {
         _change(

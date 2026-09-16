@@ -18,15 +18,9 @@ class AppUser {
   ) {
     return AppUser(
       id: (json['id'] as num?)?.toInt() ?? 0,
-
-      username:
-          json['username']?.toString() ?? '',
-
-      fullName:
-          json['fullName']?.toString() ?? '',
-
-      role:
-          tryParseRole(
+      username: json['username']?.toString() ?? '',
+      fullName: json['fullName']?.toString() ?? '',
+      role: tryParseRole(
             json['role']?.toString(),
           ) ??
           AppRole.customer,

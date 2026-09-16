@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/customer.dart';
 import '../state/customer_list_notifier.dart';
 
-class CustomerDetailsScreen
-    extends StatelessWidget {
+class CustomerDetailsScreen extends StatelessWidget {
   final int id;
 
   const CustomerDetailsScreen({
@@ -18,19 +17,14 @@ class CustomerDetailsScreen
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Покупатель'),
+        title: const Text('Покупатель'),
       ),
       body: FutureBuilder<Customer?>(
-        future: context
-            .read<CustomerListNotifier>()
-            .findById(id),
+        future: context.read<CustomerListNotifier>().findById(id),
         builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             );
           }
 
@@ -42,8 +36,7 @@ class CustomerDetailsScreen
             );
           }
 
-          final value =
-              snapshot.data;
+          final value = snapshot.data;
 
           if (value == null) {
             return const Center(
@@ -54,17 +47,13 @@ class CustomerDetailsScreen
           }
 
           return ListView(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
             children: [
               Text(
                 value.fullName,
-                style:
-                    Theme.of(context)
-                        .textTheme
-                        .headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(
                 height: 16,
@@ -81,8 +70,7 @@ class CustomerDetailsScreen
               const Text(
                 'Карта лояльности',
                 style: TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
@@ -99,15 +87,15 @@ class CustomerDetailsScreen
               ),
               if (!value.isDeleted)
                 FilledButton(
-                onPressed: () {
-                  context.push(
-                    '/customers/$id/edit',
-                  );
-                },
-                child: const Text(
-                  'Редактировать',
+                  onPressed: () {
+                    context.push(
+                      '/customers/$id/edit',
+                    );
+                  },
+                  child: const Text(
+                    'Редактировать',
+                  ),
                 ),
-              ),
             ],
           );
         },

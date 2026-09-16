@@ -5,15 +5,16 @@ import 'package:provider/provider.dart';
 import '../models/app_role.dart';
 import '../models/customer.dart';
 import '../models/simple_query.dart';
+
 import '../state/auth_notifier.dart';
 import '../state/customer_list_notifier.dart';
+
 import '../widgets/dialogs.dart';
 import '../widgets/entity_list_scaffold.dart';
 import '../widgets/entity_table.dart';
 import '../widgets/simple_filters.dart';
 
-class CustomerListScreen
-    extends StatefulWidget {
+class CustomerListScreen extends StatefulWidget {
   final SimpleQuery initialQuery;
 
   const CustomerListScreen({
@@ -22,28 +23,26 @@ class CustomerListScreen
   });
 
   @override
-  State<CustomerListScreen>
-      createState() =>
-          _CustomerListScreenState();
+  State<CustomerListScreen> createState() => _CustomerListScreenState();
 }
 
-class _CustomerListScreenState
-    extends State<CustomerListScreen> {
+class _CustomerListScreenState extends State<CustomerListScreen> {
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      context
-          .read<CustomerListNotifier>()
-          .applyQuery(
-            widget.initialQuery,
-          );
-    });
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        context.read<CustomerListNotifier>().applyQuery(
+              widget.initialQuery,
+            );
+      },
+    );
   }
 
-  void _change(SimpleQuery query) {
+  void _change(
+    SimpleQuery query,
+  ) {
     context.go(
       query.toLocation(
         '/customers',
@@ -69,9 +68,7 @@ class _CustomerListScreenState
     }
 
     try {
-      final notifier =
-          context.read<
-              CustomerListNotifier>();
+      final notifier = context.read<CustomerListNotifier>();
 
       if (hard) {
         await notifier.hardDelete(
@@ -89,8 +86,7 @@ class _CustomerListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Удаление невозможно',
+        title: 'Удаление невозможно',
         message: e.toString(),
       );
     }
@@ -100,9 +96,7 @@ class _CustomerListScreenState
     Customer customer,
   ) async {
     try {
-      await context
-          .read<CustomerListNotifier>()
-          .restore(
+      await context.read<CustomerListNotifier>().restore(
             customer.id,
           );
     } catch (e) {
@@ -112,25 +106,21 @@ class _CustomerListScreenState
 
       await messageDialog(
         context,
-        title:
-            'Восстановление невозможно',
+        title: 'Восстановление невозможно',
         message: e.toString(),
       );
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    final notifier =
-        context.watch<
-            CustomerListNotifier>();
+  Widget build(
+    BuildContext context,
+  ) {
+    final notifier = context.watch<CustomerListNotifier>();
 
-    final auth =
-        context.watch<
-            AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final query =
-        widget.initialQuery;
+    final query = widget.initialQuery;
 
     final canHardDelete = auth.can(
       AppPermission.hardDelete,
@@ -142,13 +132,10 @@ class _CustomerListScreenState
 
     return EntityListScaffold<Customer>(
       title: 'Покупатели',
-
       filters: SimpleFilters(
         query: query,
-        searchLabel:
-            'Имя, email, телефон или карта',
-        filterLabel:
-            'Уровень карты',
+        searchLabel: 'Имя, email, телефон или карта',
+        filterLabel: 'Уровень карты',
         filterOptions: const {
           'Silver': 'Silver',
           'Gold': 'Gold',
@@ -156,155 +143,173 @@ class _CustomerListScreenState
         },
         onChanged: _change,
       ),
-
       status: notifier.status,
       error: notifier.error,
       items: notifier.result.items,
       selected: notifier.selected,
-
       table: EntityTable<Customer>(
-        items:
-            notifier.result.items,
-        idOf: (c) => c.id,
-        selected:
-            notifier.selected,
-        onToggleSelect:
-            notifier.toggleSelection,
-        sortField:
-            query.sortField,
-        sortAscending:
-            query.sortAscending,
+        items: notifier.result.items,
+        idOf: (customer) => customer.id,
+        selected: notifier.selected,
+        onToggleSelect: notifier.toggleSelection,
+        sortField: query.sortField,
+        sortAscending: query.sortAscending,
         onSort: (field) {
           _change(
             query.copyWith(
               sortField: field,
               sortAscending:
-                  field ==
-                          query
-                              .sortField
-                      ? !query
-                          .sortAscending
-                      : true,
+                  field == query.sortField ? !query.sortAscending : true,
             ),
           );
         },
         columns: [
           TableColumnSpec(
             label: 'Фамилия',
-            sortField:
-                'lastName',
-            build: (c) =>
-                Text(c.fullName),
+            sortField: 'lastName',
+            build: (customer) {
+              return Text(
+                customer.fullName,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'Email',
             sortField: 'email',
-            build: (c) =>
-                Text(c.email),
+            build: (customer) {
+              return Text(
+                customer.email,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'Телефон',
-            build: (c) =>
-                Text(c.phone),
+            build: (customer) {
+              return Text(
+                customer.phone,
+              );
+            },
           ),
           TableColumnSpec(
             label: 'Баллы',
             sortField: 'points',
             numeric: true,
-            build: (c) => Text(
-              '${c.loyaltyCard.points}',
-            ),
-          ),
-        ],
-        actions: (c) => [
-          IconButton(
-            icon: const Icon(
-              Icons.visibility,
-            ),
-            onPressed: () {
-              context.push(
-                '/customers/${c.id}',
+            build: (customer) {
+              return Text(
+                '${customer.loyaltyCard.points}',
               );
             },
           ),
-          if (!c.isDeleted)
+        ],
+        actions: (customer) {
+          return [
             IconButton(
-              icon:
-                  const Icon(Icons.edit),
+              tooltip: 'Просмотр',
+              icon: const Icon(
+                Icons.visibility,
+              ),
               onPressed: () {
                 context.push(
-                  '/customers/${c.id}/edit',
+                  '/customers/'
+                  '${customer.id}',
                 );
               },
             ),
-          if (!c.isDeleted)
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline,
+            if (!customer.isDeleted)
+              IconButton(
+                tooltip: 'Редактировать',
+                icon: const Icon(
+                  Icons.edit,
+                ),
+                onPressed: () {
+                  context.push(
+                    '/customers/'
+                    '${customer.id}/edit',
+                  );
+                },
               ),
-              onPressed: () {
-                _delete(c, false);
-              },
-            ),
-          if (canRestore &&
-              c.isDeleted)
-            IconButton(
-              icon: const Icon(
-                Icons.restore,
+            if (!customer.isDeleted)
+              IconButton(
+                tooltip: 'Логически удалить',
+                icon: const Icon(
+                  Icons.delete_outline,
+                ),
+                onPressed: () {
+                  _delete(
+                    customer,
+                    false,
+                  );
+                },
               ),
-              onPressed: () {
-                _restore(c);
-              },
-            ),
-          if (canHardDelete)
-            IconButton(
-              icon: const Icon(
-                Icons.delete_forever,
+            if (canRestore && customer.isDeleted)
+              IconButton(
+                tooltip: 'Восстановить',
+                icon: const Icon(
+                  Icons.restore,
+                ),
+                onPressed: () {
+                  _restore(
+                    customer,
+                  );
+                },
               ),
-              onPressed: () {
-                _delete(c, true);
-              },
-            ),
-        ],
+            if (canHardDelete)
+              IconButton(
+                tooltip: 'Удалить навсегда',
+                icon: const Icon(
+                  Icons.delete_forever,
+                ),
+                onPressed: () {
+                  _delete(
+                    customer,
+                    true,
+                  );
+                },
+              ),
+          ];
+        },
       ),
-
-      cardBuilder: (c) => Card(
-        child: ListTile(
-          title: Text(c.fullName),
-          subtitle: Text(
-            '${c.email}\n${c.loyaltyCard.level}',
+      cardBuilder: (customer) {
+        return Card(
+          child: ListTile(
+            title: Text(
+              customer.fullName,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              '${customer.email}\n'
+              '${customer.loyaltyCard.level}',
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              context.push(
+                '/customers/'
+                '${customer.id}',
+              );
+            },
           ),
-          onTap: () {
-            context.push(
-              '/customers/${c.id}',
-            );
-          },
-        ),
-      ),
-
-      onDeleteSelected:
-          notifier.deleteSelected,
-
+        );
+      },
+      onDeleteSelected: notifier.deleteSelected,
       onRetry: notifier.load,
-
       onCreate: () {
         context.push(
           '/customers/new',
         );
       },
-
       page: notifier.result.page,
-      totalPages:
-          notifier.result.totalPages,
+      totalPages: notifier.result.totalPages,
       total: notifier.result.total,
       size: notifier.result.size,
-
       onPageChanged: (page) {
         _change(
-          query.copyWith(page: page),
+          query.copyWith(
+            page: page,
+          ),
         );
       },
-
       onSizeChanged: (size) {
         _change(
           query.copyWith(

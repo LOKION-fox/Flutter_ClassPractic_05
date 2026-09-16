@@ -35,12 +35,8 @@ class Supplier {
       name: name ?? this.name,
       country: country ?? this.country,
       email: email ?? this.email,
-      allowedCategoryIds:
-          allowedCategoryIds ??
-              this.allowedCategoryIds,
-      deletedAt: clearDeletedAt
-          ? null
-          : (deletedAt ?? this.deletedAt),
+      allowedCategoryIds: allowedCategoryIds ?? this.allowedCategoryIds,
+      deletedAt: clearDeletedAt ? null : (deletedAt ?? this.deletedAt),
     );
   }
 
@@ -50,10 +46,8 @@ class Supplier {
       'name': name,
       'country': country,
       'email': email,
-      'allowedCategoryIds':
-          allowedCategoryIds,
-      'deletedAt':
-          deletedAt?.toIso8601String(),
+      'allowedCategoryIds': allowedCategoryIds,
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
@@ -63,16 +57,13 @@ class Supplier {
     return Supplier(
       id: jsonInt(json, 'id'),
       name: jsonString(json, 'name'),
-      country:
-          jsonString(json, 'country'),
+      country: jsonString(json, 'country'),
       email: jsonString(json, 'email'),
-      allowedCategoryIds:
-          jsonIntList(
+      allowedCategoryIds: jsonIntList(
         json,
         'allowedCategoryIds',
       ),
-      deletedAt:
-          jsonDate(json, 'deletedAt'),
+      deletedAt: jsonDate(json, 'deletedAt'),
     );
   }
 }

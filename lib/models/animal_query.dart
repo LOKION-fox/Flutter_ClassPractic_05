@@ -48,42 +48,16 @@ class AnimalQuery {
   }) {
     return AnimalQuery(
       search: search ?? this.search,
-
-      species: species == _unset
-          ? this.species
-          : species as String?,
-
-      sex: sex == _unset
-          ? this.sex
-          : sex as String?,
-
-      supplierId:
-          supplierId == _unset
-              ? this.supplierId
-              : supplierId as int?,
-
-      priceFrom:
-          priceFrom == _unset
-              ? this.priceFrom
-              : priceFrom as double?,
-
-      priceTo: priceTo == _unset
-          ? this.priceTo
-          : priceTo as double?,
-
-      sortField:
-          sortField ?? this.sortField,
-
-      sortAscending:
-          sortAscending ??
-              this.sortAscending,
-
+      species: species == _unset ? this.species : species as String?,
+      sex: sex == _unset ? this.sex : sex as String?,
+      supplierId: supplierId == _unset ? this.supplierId : supplierId as int?,
+      priceFrom: priceFrom == _unset ? this.priceFrom : priceFrom as double?,
+      priceTo: priceTo == _unset ? this.priceTo : priceTo as double?,
+      sortField: sortField ?? this.sortField,
+      sortAscending: sortAscending ?? this.sortAscending,
       page: page ?? 1,
       size: size ?? this.size,
-
-      includeDeleted:
-          includeDeleted ??
-              this.includeDeleted,
+      includeDeleted: includeDeleted ?? this.includeDeleted,
     );
   }
 
@@ -92,9 +66,7 @@ class AnimalQuery {
   ) {
     final q = uri.queryParameters;
 
-    final sort =
-        (q['sort'] ?? 'name,asc')
-            .split(',');
+    final sort = (q['sort'] ?? 'name,asc').split(',');
 
     var field = sort.first;
 
@@ -106,8 +78,7 @@ class AnimalQuery {
       field = 'name';
     }
 
-    var page =
-        int.tryParse(
+    var page = int.tryParse(
           q['page'] ?? '',
         ) ??
         1;
@@ -116,14 +87,12 @@ class AnimalQuery {
       page = 1;
     }
 
-    var size =
-        int.tryParse(
+    var size = int.tryParse(
           q['size'] ?? '',
         ) ??
         10;
 
-    if (![10, 25, 50]
-        .contains(size)) {
+    if (![10, 25, 50].contains(size)) {
       size = 10;
     }
 
@@ -131,51 +100,34 @@ class AnimalQuery {
       search: q['search'] ?? '',
       species: q['species'],
       sex: q['sex'],
-
       supplierId: int.tryParse(
         q['supplierId'] ?? '',
       ),
-
       priceFrom: double.tryParse(
         q['priceFrom'] ?? '',
       ),
-
       priceTo: double.tryParse(
         q['priceTo'] ?? '',
       ),
-
       sortField: field,
-
-      sortAscending:
-          sort.length < 2 ||
-              sort[1] != 'desc',
-
+      sortAscending: sort.length < 2 || sort[1] != 'desc',
       page: page,
       size: size,
-
-      includeDeleted:
-          q['deleted'] == '1',
+      includeDeleted: q['deleted'] == '1',
     );
   }
 
-  Map<String, dynamic>
-      toApiQueryParameters() {
-    final apiSortField =
-        sortField == 'age'
-            ? 'ageMonths'
-            : sortField;
+  Map<String, dynamic> toApiQueryParameters() {
+    final apiSortField = sortField == 'age' ? 'ageMonths' : sortField;
 
-    final result =
-        <String, dynamic>{
-      'sort':
-          '$apiSortField,${sortAscending ? 'asc' : 'desc'}',
+    final result = <String, dynamic>{
+      'sort': '$apiSortField,${sortAscending ? 'asc' : 'desc'}',
       'page': page,
       'size': size,
     };
 
     if (search.trim().isNotEmpty) {
-      result['search'] =
-          search.trim();
+      result['search'] = search.trim();
     }
 
     if (species != null) {
@@ -187,23 +139,19 @@ class AnimalQuery {
     }
 
     if (supplierId != null) {
-      result['supplierId'] =
-          supplierId;
+      result['supplierId'] = supplierId;
     }
 
     if (priceFrom != null) {
-      result['priceFrom'] =
-          priceFrom;
+      result['priceFrom'] = priceFrom;
     }
 
     if (priceTo != null) {
-      result['priceTo'] =
-          priceTo;
+      result['priceTo'] = priceTo;
     }
 
     if (includeDeleted) {
-      result['includeDeleted'] =
-          'true';
+      result['includeDeleted'] = 'true';
     }
 
     return result;
@@ -212,17 +160,14 @@ class AnimalQuery {
   String toLocation(
     String path,
   ) {
-    final params =
-        <String, String>{};
+    final params = <String, String>{};
 
     if (search.trim().isNotEmpty) {
-      params['search'] =
-          search.trim();
+      params['search'] = search.trim();
     }
 
     if (species != null) {
-      params['species'] =
-          species!;
+      params['species'] = species!;
     }
 
     if (sex != null) {
@@ -230,28 +175,22 @@ class AnimalQuery {
     }
 
     if (supplierId != null) {
-      params['supplierId'] =
-          supplierId.toString();
+      params['supplierId'] = supplierId.toString();
     }
 
     if (priceFrom != null) {
-      params['priceFrom'] =
-          priceFrom.toString();
+      params['priceFrom'] = priceFrom.toString();
     }
 
     if (priceTo != null) {
-      params['priceTo'] =
-          priceTo.toString();
+      params['priceTo'] = priceTo.toString();
     }
 
-    params['sort'] =
-        '$sortField,${sortAscending ? 'asc' : 'desc'}';
+    params['sort'] = '$sortField,${sortAscending ? 'asc' : 'desc'}';
 
-    params['page'] =
-        page.toString();
+    params['page'] = page.toString();
 
-    params['size'] =
-        size.toString();
+    params['size'] = size.toString();
 
     if (includeDeleted) {
       params['deleted'] = '1';
@@ -271,25 +210,18 @@ class AnimalQuery {
         other.search == search &&
         other.species == species &&
         other.sex == sex &&
-        other.supplierId ==
-            supplierId &&
-        other.priceFrom ==
-            priceFrom &&
-        other.priceTo ==
-            priceTo &&
-        other.sortField ==
-            sortField &&
-        other.sortAscending ==
-            sortAscending &&
+        other.supplierId == supplierId &&
+        other.priceFrom == priceFrom &&
+        other.priceTo == priceTo &&
+        other.sortField == sortField &&
+        other.sortAscending == sortAscending &&
         other.page == page &&
         other.size == size &&
-        other.includeDeleted ==
-            includeDeleted;
+        other.includeDeleted == includeDeleted;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(
+  int get hashCode => Object.hash(
         search,
         species,
         sex,

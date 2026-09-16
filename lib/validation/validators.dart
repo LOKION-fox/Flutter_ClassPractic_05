@@ -3,8 +3,7 @@ class Validators {
     String? value, {
     String field = 'Поле',
   }) {
-    if (value == null ||
-        value.trim().isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return '$field обязательно для заполнения';
     }
 
@@ -16,8 +15,7 @@ class Validators {
     int max, {
     String field = 'Поле',
   }) {
-    if (value != null &&
-        value.trim().length > max) {
+    if (value != null && value.trim().length > max) {
       return '$field: максимум $max символов';
     }
 
@@ -29,8 +27,7 @@ class Validators {
     int max, {
     String field = 'Поле',
   }) {
-    final required =
-        requiredText(
+    final required = requiredText(
       value,
       field: field,
     );
@@ -52,8 +49,7 @@ class Validators {
     required double max,
     required String field,
   }) {
-    final required =
-        requiredText(
+    final required = requiredText(
       value,
       field: field,
     );
@@ -62,19 +58,15 @@ class Validators {
       return required;
     }
 
-    final number =
-        double.tryParse(
-      value!
-          .trim()
-          .replaceAll(',', '.'),
+    final number = double.tryParse(
+      value!.trim().replaceAll(',', '.'),
     );
 
     if (number == null) {
       return '$field должно быть числом';
     }
 
-    if (number < min ||
-        number > max) {
+    if (number < min || number > max) {
       return '$field должно быть от $min до $max';
     }
 
@@ -87,8 +79,7 @@ class Validators {
     required int max,
     required String field,
   }) {
-    final required =
-        requiredText(
+    final required = requiredText(
       value,
       field: field,
     );
@@ -97,8 +88,7 @@ class Validators {
       return required;
     }
 
-    final number =
-        int.tryParse(
+    final number = int.tryParse(
       value!.trim(),
     );
 
@@ -106,8 +96,7 @@ class Validators {
       return '$field должно быть целым числом';
     }
 
-    if (number < min ||
-        number > max) {
+    if (number < min || number > max) {
       return '$field должно быть от $min до $max';
     }
 
@@ -117,8 +106,7 @@ class Validators {
   static String? email(
     String? value,
   ) {
-    final required =
-        requiredText(
+    final required = requiredText(
       value,
       field: 'Email',
     );
@@ -143,8 +131,7 @@ class Validators {
   static String? phone(
     String? value,
   ) {
-    final required =
-        requiredText(
+    final required = requiredText(
       value,
       field: 'Телефон',
     );
@@ -170,8 +157,7 @@ class Validators {
     int? value, {
     required String field,
   }) {
-    if (value == null ||
-        value <= 0) {
+    if (value == null || value <= 0) {
       return 'Выберите $field';
     }
 
@@ -182,8 +168,7 @@ class Validators {
     List<int>? value, {
     required String field,
   }) {
-    if (value == null ||
-        value.isEmpty) {
+    if (value == null || value.isEmpty) {
       return 'Выберите хотя бы один вариант: $field';
     }
 

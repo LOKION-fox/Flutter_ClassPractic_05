@@ -11,16 +11,12 @@ import '../models/app_role.dart';
 import '../models/app_user.dart';
 import '../models/auth_result.dart';
 
-class AuthNotifier
-    extends ChangeNotifier {
-  static const _accessKey =
-      'auth_access_token';
+class AuthNotifier extends ChangeNotifier {
+  static const _accessKey = 'auth_access_token';
 
-  static const _refreshKey =
-      'auth_refresh_token';
+  static const _refreshKey = 'auth_refresh_token';
 
-  static const _userKey =
-      'auth_user';
+  static const _userKey = 'auth_user';
 
   // Это значение используется ТОЛЬКО
   // для отображения интерфейса.
@@ -29,14 +25,11 @@ class AuthNotifier
   //
   // Оно специально оставлено в localStorage,
   // чтобы выполнить пункт 17 практической.
-  static const _uiRoleKey =
-      'auth_ui_role';
+  static const _uiRoleKey = 'auth_ui_role';
 
-  static const _sessionStartedKey =
-      'auth_session_started';
+  static const _sessionStartedKey = 'auth_session_started';
 
-  static const _lastActivityKey =
-      'auth_last_activity';
+  static const _lastActivityKey = 'auth_last_activity';
 
   final SharedPreferences _prefs;
   final AuthService _api;
@@ -64,20 +57,15 @@ class AuthNotifier
 
   AppRole? get uiRole => _uiRole;
 
-  String? get accessToken =>
-      _session.accessToken;
+  String? get accessToken => _session.accessToken;
 
   String? get notice => _notice;
 
-  DateTime? get sessionStartedAt =>
-      _sessionStartedAt;
+  DateTime? get sessionStartedAt => _sessionStartedAt;
 
-  DateTime? get lastActivityAt =>
-      _lastActivityAt;
+  DateTime? get lastActivityAt => _lastActivityAt;
 
-  bool get isAuthenticated =>
-      _user != null &&
-      _session.isAuthorized;
+  bool get isAuthenticated => _user != null && _session.isAuthorized;
 
   bool isUiRole(
     AppRole role,
@@ -105,13 +93,11 @@ class AuthNotifier
   }
 
   Future<void> restore() async {
-    final access =
-        _prefs.getString(
+    final access = _prefs.getString(
       _accessKey,
     );
 
-    final refresh =
-        _prefs.getString(
+    final refresh = _prefs.getString(
       _refreshKey,
     );
 
@@ -122,8 +108,7 @@ class AuthNotifier
     _session.accessToken = access;
     _session.refreshToken = refresh;
 
-    final cachedUser =
-        _prefs.getString(
+    final cachedUser = _prefs.getString(
       _userKey,
     );
 
@@ -148,26 +133,22 @@ class AuthNotifier
         ) ??
         _user?.role;
 
-    final startedMs =
-        _prefs.getInt(
+    final startedMs = _prefs.getInt(
       _sessionStartedKey,
     );
 
-    final activityMs =
-        _prefs.getInt(
+    final activityMs = _prefs.getInt(
       _lastActivityKey,
     );
 
     if (startedMs != null) {
-      _sessionStartedAt =
-          DateTime.fromMillisecondsSinceEpoch(
+      _sessionStartedAt = DateTime.fromMillisecondsSinceEpoch(
         startedMs,
       );
     }
 
     if (activityMs != null) {
-      _lastActivityAt =
-          DateTime.fromMillisecondsSinceEpoch(
+      _lastActivityAt = DateTime.fromMillisecondsSinceEpoch(
         activityMs,
       );
     }
@@ -175,16 +156,13 @@ class AuthNotifier
     final now = DateTime.now();
 
     if (_sessionStartedAt != null) {
-      final total =
-          now.difference(
+      final total = now.difference(
         _sessionStartedAt!,
       );
 
       if (total >=
           const Duration(
-            seconds:
-                ApiConfig
-                    .maxSessionSeconds,
+            seconds: ApiConfig.maxSessionSeconds,
           )) {
         await forceLogout(
           'Максимальное время сессии истекло.',
@@ -195,16 +173,13 @@ class AuthNotifier
     }
 
     if (_lastActivityAt != null) {
-      final inactive =
-          now.difference(
+      final inactive = now.difference(
         _lastActivityAt!,
       );
 
       if (inactive >=
           const Duration(
-            seconds:
-                ApiConfig
-                    .inactivitySeconds,
+            seconds: ApiConfig.inactivitySeconds,
           )) {
         await forceLogout(
           'Сессия завершена из-за неактивности.',
@@ -224,8 +199,7 @@ class AuthNotifier
 
       await _saveUser();
     } on UnauthorizedException {
-      final success =
-          await refreshTokens();
+      final success = await refreshTokens();
 
       if (!success) {
         return;
@@ -236,24 +210,20 @@ class AuthNotifier
     }
 
     if (_sessionStartedAt == null) {
-      _sessionStartedAt =
-          DateTime.now();
+      _sessionStartedAt = DateTime.now();
 
       await _prefs.setInt(
         _sessionStartedKey,
-        _sessionStartedAt!
-            .millisecondsSinceEpoch,
+        _sessionStartedAt!.millisecondsSinceEpoch,
       );
     }
 
     if (_lastActivityAt == null) {
-      _lastActivityAt =
-          DateTime.now();
+      _lastActivityAt = DateTime.now();
 
       await _prefs.setInt(
         _lastActivityKey,
-        _lastActivityAt!
-            .millisecondsSinceEpoch,
+        _lastActivityAt!.millisecondsSinceEpoch,
       );
     }
 
@@ -264,8 +234,7 @@ class AuthNotifier
     String username,
     String password,
   ) async {
-    final result =
-        await _api.login(
+    final result = await _api.login(
       username,
       password,
     );
@@ -295,11 +264,9 @@ class AuthNotifier
   Future<void> _applyNewLogin(
     AuthResult result,
   ) async {
-    _session.accessToken =
-        result.accessToken;
+    _session.accessToken = result.accessToken;
 
-    _session.refreshToken =
-        result.refreshToken;
+    _session.refreshToken = result.refreshToken;
 
     _user = result.user;
 
@@ -308,11 +275,9 @@ class AuthNotifier
     // полученной от сервера.
     _uiRole = result.user.role;
 
-    _sessionStartedAt =
-        DateTime.now();
+    _sessionStartedAt = DateTime.now();
 
-    _lastActivityAt =
-        DateTime.now();
+    _lastActivityAt = DateTime.now();
 
     _notice = null;
 
@@ -335,29 +300,25 @@ class AuthNotifier
 
     await _prefs.setInt(
       _sessionStartedKey,
-      _sessionStartedAt!
-          .millisecondsSinceEpoch,
+      _sessionStartedAt!.millisecondsSinceEpoch,
     );
 
     await _prefs.setInt(
       _lastActivityKey,
-      _lastActivityAt!
-          .millisecondsSinceEpoch,
+      _lastActivityAt!.millisecondsSinceEpoch,
     );
 
     notifyListeners();
   }
 
   Future<bool> refreshTokens() {
-    final running =
-        _refreshFuture;
+    final running = _refreshFuture;
 
     if (running != null) {
       return running;
     }
 
-    final future =
-        _refreshTokensInternal();
+    final future = _refreshTokensInternal();
 
     _refreshFuture = future;
 
@@ -370,13 +331,10 @@ class AuthNotifier
     return future;
   }
 
-  Future<bool>
-      _refreshTokensInternal() async {
-    final refresh =
-        _session.refreshToken;
+  Future<bool> _refreshTokensInternal() async {
+    final refresh = _session.refreshToken;
 
-    if (refresh == null ||
-        refresh.isEmpty) {
+    if (refresh == null || refresh.isEmpty) {
       await forceLogout(
         'Сессия истекла. Войдите снова.',
       );
@@ -385,16 +343,13 @@ class AuthNotifier
     }
 
     try {
-      final result =
-          await _api.refresh(
+      final result = await _api.refresh(
         refresh,
       );
 
-      _session.accessToken =
-          result.accessToken;
+      _session.accessToken = result.accessToken;
 
-      _session.refreshToken =
-          result.refreshToken;
+      _session.refreshToken = result.refreshToken;
 
       _user = result.user;
 
@@ -423,8 +378,7 @@ class AuthNotifier
   }
 
   Future<void> logout() async {
-    final refresh =
-        _session.refreshToken;
+    final refresh = _session.refreshToken;
 
     try {
       await _api.logout(
@@ -509,8 +463,7 @@ class AuthNotifier
 
     _lastActivityAt = now;
 
-    final previous =
-        _lastActivitySavedAt;
+    final previous = _lastActivitySavedAt;
 
     if (previous == null ||
         now.difference(previous) >=

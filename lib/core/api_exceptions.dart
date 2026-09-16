@@ -1,5 +1,4 @@
-class ApiException
-    implements Exception {
+class ApiException implements Exception {
   final String message;
 
   const ApiException(
@@ -10,59 +9,50 @@ class ApiException
   String toString() => message;
 }
 
-class NetworkException
-    extends ApiException {
+class NetworkException extends ApiException {
   const NetworkException(
     super.message,
   );
 }
 
-class UnauthorizedException
-    extends ApiException {
+class UnauthorizedException extends ApiException {
   const UnauthorizedException(
     super.message,
   );
 }
 
-class ForbiddenException
-    extends ApiException {
+class ForbiddenException extends ApiException {
   const ForbiddenException(
     super.message,
   );
 }
 
-class NotFoundException
-    extends ApiException {
+class NotFoundException extends ApiException {
   const NotFoundException(
     super.message,
   );
 }
 
-class ConflictException
-    extends ApiException {
+class ConflictException extends ApiException {
   const ConflictException(
     super.message,
   );
 }
 
-class ServerException
-    extends ApiException {
+class ServerException extends ApiException {
   const ServerException(
     super.message,
   );
 }
 
-class BadRequestException
-    extends ApiException {
+class BadRequestException extends ApiException {
   const BadRequestException(
     super.message,
   );
 }
 
-class ValidationException
-    extends ApiException {
-  final Map<String, String>
-      errors;
+class ValidationException extends ApiException {
+  final Map<String, String> errors;
 
   const ValidationException(
     super.message,
@@ -70,8 +60,7 @@ class ValidationException
   );
 }
 
-class RequestCancelledException
-    extends ApiException {
+class RequestCancelledException extends ApiException {
   const RequestCancelledException()
       : super(
           'Запрос был отменён',

@@ -7,8 +7,7 @@ import '../models/app_role.dart';
 import '../state/animal_list_notifier.dart';
 import '../state/auth_notifier.dart';
 
-class AnimalDetailsScreen
-    extends StatelessWidget {
+class AnimalDetailsScreen extends StatelessWidget {
   final int id;
 
   const AnimalDetailsScreen({
@@ -20,22 +19,14 @@ class AnimalDetailsScreen
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Животное'),
+        title: const Text('Животное'),
       ),
-
       body: FutureBuilder<Animal?>(
-        future: context
-            .read<AnimalListNotifier>()
-            .findById(id),
-
+        future: context.read<AnimalListNotifier>().findById(id),
         builder: (context, snapshot) {
-          if (snapshot
-                  .connectionState ==
-              ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             );
           }
 
@@ -47,8 +38,7 @@ class AnimalDetailsScreen
             );
           }
 
-          final animal =
-              snapshot.data;
+          final animal = snapshot.data;
 
           if (animal == null) {
             return const Center(
@@ -58,26 +48,18 @@ class AnimalDetailsScreen
             );
           }
 
-          final canManage =
-              context
-                  .watch<AuthNotifier>()
-                  .can(
-                AppPermission
-                    .manageCatalog,
+          final canManage = context.watch<AuthNotifier>().can(
+                AppPermission.manageCatalog,
               );
 
           return ListView(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
             children: [
               Text(
                 animal.name,
-                style:
-                    Theme.of(context)
-                        .textTheme
-                        .headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(
                 height: 16,
@@ -109,16 +91,14 @@ class AnimalDetailsScreen
               const SizedBox(
                 height: 20,
               ),
-              if (canManage &&
-                  !animal.isDeleted)
+              if (canManage && !animal.isDeleted)
                 FilledButton.icon(
                   onPressed: () {
                     context.push(
                       '/animals/$id/edit',
                     );
                   },
-                  icon:
-                      const Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   label: const Text(
                     'Редактировать',
                   ),

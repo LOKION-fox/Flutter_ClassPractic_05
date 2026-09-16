@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../models/app_role.dart';
 import '../state/auth_notifier.dart';
+import '../widgets/permission_gate.dart';
 
-class HomeScreen
-    extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
   });
@@ -16,19 +16,22 @@ class HomeScreen
     String text,
     String route,
     IconData icon,
+    double width,
   ) {
     return SizedBox(
-      width: 250,
-      height: 60,
-
+      width: width,
+      height: 64,
       child: FilledButton.icon(
         onPressed: () {
           context.go(route);
         },
-
         icon: Icon(icon),
-
-        label: Text(text),
+        label: Text(
+          text,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
@@ -37,116 +40,133 @@ class HomeScreen
   Widget build(
     BuildContext context,
   ) {
-    final auth =
-        context.watch<
-            AuthNotifier>();
+    final auth = context.watch<AuthNotifier>();
 
-    final role =
-        auth.uiRole;
+    final role = auth.uiRole;
+
+    final screenWidth = MediaQuery.sizeOf(
+      context,
+    ).width;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Зоомагазин — '
           '${auth.user?.fullName ?? ''}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
-
         actions: [
-          Padding(
-            padding:
-                const EdgeInsets
-                    .symmetric(
-              horizontal: 12,
-            ),
-
-            child: Center(
-              child: Text(
-                role?.title ?? '',
+          if (screenWidth >= 600)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+              ),
+              child: Center(
+                child: Text(
+                  role?.title ?? '',
+                ),
               ),
             ),
-          ),
-
           IconButton(
             tooltip: 'Выйти',
-
             onPressed: () async {
               await auth.logout();
             },
-
             icon: const Icon(
               Icons.logout,
             ),
           ),
         ],
       ),
-
       body: Center(
-        child:
-            SingleChildScrollView(
-          padding:
-              const EdgeInsets.all(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(
             24,
           ),
-
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-
-            alignment:
-                WrapAlignment.center,
-
-            children: [
-              _button(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 1100,
+            ),
+            child: LayoutBuilder(
+              builder: (
                 context,
-                'Товары',
-                '/products',
-                Icons.shopping_bag,
-              ),
+                constraints,
+              ) {
+                const spacing = 16.0;
 
-              _button(
-                context,
-                'Животные',
-                '/animals',
-                Icons.pets,
-              ),
+                final columns = constraints.maxWidth < 600
+                    ? 1
+                    : constraints.maxWidth < 1000
+                        ? 2
+                        : 3;
 
-              if (role ==
-                  AppRole.customer)
-                _button(
-                  context,
-                  'Мой кабинет',
-                  '/account',
-                  Icons.person,
-                ),
+                final buttonWidth =
+                    (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
-              if (role ==
-                      AppRole.manager ||
-                  role ==
-                      AppRole.admin)
-                _button(
-                  context,
-                  'Панель управления',
-                  '/management',
-                  Icons.store,
-                ),
-
-              if (role ==
-                  AppRole.admin) ...[
-                _button(
-                  context,
-                  'Пользователи',
-                  '/admin/users',
-                  Icons.manage_accounts,
-                ),
-
-                _button(
-                  context,
-                  'Статистика',
-                  '/admin/stats',
-                  Icons.bar_chart,
-                ),
-              ],
-            ],
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _button(
+                      context,
+                      'Товары',
+                      '/products',
+                      Icons.shopping_bag,
+                      buttonWidth,
+                    ),
+                    _button(
+                      context,
+                      'Животные',
+                      '/animals',
+                      Icons.pets,
+                      buttonWidth,
+                    ),
+                    PermissionGate(
+                      allowed: role == AppRole.customer,
+                      child: _button(
+                        context,
+                        'Мой кабинет',
+                        '/account',
+                        Icons.person,
+                        buttonWidth,
+                      ),
+                    ),
+                    PermissionGate(
+                      allowed: role == AppRole.manager || role == AppRole.admin,
+                      child: _button(
+                        context,
+                        'Панель управления',
+                        '/management',
+                        Icons.store,
+                        buttonWidth,
+                      ),
+                    ),
+                    PermissionGate(
+                      allowed: role == AppRole.admin,
+                      child: _button(
+                        context,
+                        'Пользователи',
+                        '/admin/users',
+                        Icons.manage_accounts,
+                        buttonWidth,
+                      ),
+                    ),
+                    PermissionGate(
+                      allowed: role == AppRole.admin,
+                      child: _button(
+                        context,
+                        'Статистика',
+                        '/admin/stats',
+                        Icons.bar_chart,
+                        buttonWidth,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

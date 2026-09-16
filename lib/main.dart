@@ -34,33 +34,25 @@ import 'state/user_admin_notifier.dart';
 import 'widgets/session_watcher.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   usePathUrlStrategy();
 
-  final prefs =
-      await SharedPreferences
-          .getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
-  final session =
-      AuthSession();
+  final session = AuthSession();
 
-  final apiClient =
-      ApiClient(
-    baseUrl:
-        ApiConfig.baseUrl,
+  final apiClient = ApiClient(
+    baseUrl: ApiConfig.baseUrl,
     session: session,
   );
 
-  final authService =
-      AuthService(
+  final authService = AuthService(
     apiClient,
     session,
   );
 
-  final authNotifier =
-      AuthNotifier(
+  final authNotifier = AuthNotifier(
     prefs,
     authService,
     session,
@@ -68,15 +60,12 @@ Future<void> main() async {
 
   // При 401 ApiClient просит
   // AuthNotifier обновить токен.
-  apiClient.onRefreshRequested =
-      authNotifier.refreshTokens;
+  apiClient.onRefreshRequested = authNotifier.refreshTokens;
 
   // Если обновить токен не удалось,
   // завершаем сессию.
-  apiClient.onSessionExpired =
-      () {
-    return authNotifier
-        .forceLogout(
+  apiClient.onSessionExpired = () {
+    return authNotifier.forceLogout(
       'Сессия истекла. '
       'Войдите снова.',
     );
@@ -85,142 +74,101 @@ Future<void> main() async {
   // Восстанавливаем токены после F5.
   await authNotifier.restore();
 
-  final productRepository =
-      ApiProductRepository(
+  final productRepository = ApiProductRepository(
     apiClient,
     authService,
   );
 
-  final animalRepository =
-      ApiAnimalRepository(
+  final animalRepository = ApiAnimalRepository(
     apiClient,
     authService,
   );
 
-  final categoryRepository =
-      ApiCategoryRepository(
+  final categoryRepository = ApiCategoryRepository(
     apiClient,
     authService,
   );
 
-  final supplierRepository =
-      ApiSupplierRepository(
+  final supplierRepository = ApiSupplierRepository(
     apiClient,
     authService,
   );
 
-  final customerRepository =
-      ApiCustomerRepository(
+  final customerRepository = ApiCustomerRepository(
     apiClient,
     authService,
   );
 
-  final userAdminRepository =
-      ApiUserAdminRepository(
+  final userAdminRepository = ApiUserAdminRepository(
     apiClient,
     authService,
   );
 
-  final router =
-      buildRouter(
+  final router = buildRouter(
     authNotifier,
   );
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<
-            AuthNotifier>.value(
+        ChangeNotifierProvider<AuthNotifier>.value(
           value: authNotifier,
         ),
-
         Provider<ApiClient>.value(
           value: apiClient,
         ),
-
         Provider<AuthService>.value(
           value: authService,
         ),
-
-        Provider<ProductRepository>
-            .value(
-          value:
-              productRepository,
+        Provider<ProductRepository>.value(
+          value: productRepository,
         ),
-
-        Provider<AnimalRepository>
-            .value(
-          value:
-              animalRepository,
+        Provider<AnimalRepository>.value(
+          value: animalRepository,
         ),
-
-        Provider<CategoryRepository>
-            .value(
-          value:
-              categoryRepository,
+        Provider<CategoryRepository>.value(
+          value: categoryRepository,
         ),
-
-        Provider<SupplierRepository>
-            .value(
-          value:
-              supplierRepository,
+        Provider<SupplierRepository>.value(
+          value: supplierRepository,
         ),
-
-        Provider<CustomerRepository>
-            .value(
-          value:
-              customerRepository,
+        Provider<CustomerRepository>.value(
+          value: customerRepository,
         ),
-
-        Provider<UserAdminRepository>
-            .value(
-          value:
-              userAdminRepository,
+        Provider<UserAdminRepository>.value(
+          value: userAdminRepository,
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              ProductListNotifier(
+          create: (_) => ProductListNotifier(
             productRepository,
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              AnimalListNotifier(
+          create: (_) => AnimalListNotifier(
             animalRepository,
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              CategoryListNotifier(
+          create: (_) => CategoryListNotifier(
             categoryRepository,
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              SupplierListNotifier(
+          create: (_) => SupplierListNotifier(
             supplierRepository,
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              CustomerListNotifier(
+          create: (_) => CustomerListNotifier(
             customerRepository,
           ),
         ),
-
         ChangeNotifierProvider(
-          create: (_) =>
-              UserAdminNotifier(
+          create: (_) => UserAdminNotifier(
             userAdminRepository,
           ),
         ),
       ],
-
       child: PetShopApp(
         router: router,
         auth: authNotifier,
@@ -229,10 +177,8 @@ Future<void> main() async {
   );
 }
 
-class PetShopApp
-    extends StatelessWidget {
-  final RouterConfig<Object>
-      router;
+class PetShopApp extends StatelessWidget {
+  final RouterConfig<Object> router;
 
   final AuthNotifier auth;
 
@@ -248,29 +194,18 @@ class PetShopApp
   ) {
     return MaterialApp.router(
       title: 'Зоомагазин',
-
-      debugShowCheckedModeBanner:
-          false,
-
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(
+        colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.teal,
         ),
-
         useMaterial3: true,
       ),
-
       routerConfig: router,
-
-      builder:
-          (context, child) {
+      builder: (context, child) {
         return SessionWatcher(
           auth: auth,
-
-          child:
-              child ??
-                  const SizedBox(),
+          child: child ?? const SizedBox(),
         );
       },
     );

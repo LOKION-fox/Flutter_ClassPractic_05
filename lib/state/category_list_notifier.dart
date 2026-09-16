@@ -7,22 +7,18 @@ import '../models/simple_query.dart';
 import '../repositories/category_repository.dart';
 import 'load_status.dart';
 
-class CategoryListNotifier
-    extends ChangeNotifier {
+class CategoryListNotifier extends ChangeNotifier {
   final CategoryRepository _repository;
 
   CategoryListNotifier(
     this._repository,
   );
 
-  SimpleQuery _query =
-      const SimpleQuery();
+  SimpleQuery _query = const SimpleQuery();
 
-  PageResult<Category> _result =
-      PageResult<Category>.empty();
+  PageResult<Category> _result = PageResult<Category>.empty();
 
-  LoadStatus _status =
-      LoadStatus.idle;
+  LoadStatus _status = LoadStatus.idle;
 
   String? _error;
 
@@ -30,15 +26,13 @@ class CategoryListNotifier
 
   SimpleQuery get query => _query;
 
-  PageResult<Category> get result =>
-      _result;
+  PageResult<Category> get result => _result;
 
   LoadStatus get status => _status;
 
   String? get error => _error;
 
-  Set<int> get selected =>
-      Set.unmodifiable(_selected);
+  Set<int> get selected => Set.unmodifiable(_selected);
 
   Future<void> load() async {
     _status = LoadStatus.loading;
@@ -46,8 +40,7 @@ class CategoryListNotifier
     notifyListeners();
 
     try {
-      _result =
-          await _repository.find(
+      _result = await _repository.find(
         _query,
       );
 
@@ -58,8 +51,7 @@ class CategoryListNotifier
       _error = e.message;
       _status = LoadStatus.error;
     } catch (e) {
-      _error =
-          'Неизвестная ошибка: $e';
+      _error = 'Неизвестная ошибка: $e';
 
       _status = LoadStatus.error;
     }
@@ -90,15 +82,12 @@ class CategoryListNotifier
     return _repository.all();
   }
 
-  Future<List<Category>>
-      getAllActive() async {
-    final values =
-        await _repository.all();
+  Future<List<Category>> getAllActive() async {
+    final values = await _repository.all();
 
     return values
         .where(
-          (item) =>
-              !item.isDeleted,
+          (item) => !item.isDeleted,
         )
         .toList();
   }
@@ -112,8 +101,7 @@ class CategoryListNotifier
   Future<Category> create(
     Category category,
   ) async {
-    final created =
-        await _repository.create(
+    final created = await _repository.create(
       category,
     );
 
